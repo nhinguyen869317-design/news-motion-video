@@ -49,14 +49,15 @@ footer{max-width:1200px;padding:0 16px 25px;margin:auto;color:var(--muted);font-
 <body>
 <header>
   <h1>🎬 News Motion Studio</h1>
-  <p>Tạo video từ ảnh, lưu thư viện nhạc và xuất WebM.</p>
+  <p>Tạo video từ nhiều ảnh, lưu thư viện nhạc và xuất WebM có âm thanh.</p>
 </header>
 
 <main>
 <section class="panel">
   <h2>1. Ảnh và video</h2>
-  <label for="imageInput">Tải ảnh lên</label>
-  <input id="imageInput" type="file" accept="image/*">
+  <label for="imageInput">Tải nhiều ảnh lên</label>
+  <input id="imageInput" type="file" accept="image/*" multiple>
+  <p id="imageStatus" class="small">Có thể chọn nhiều ảnh cùng lúc. Các ảnh sẽ lần lượt xuất hiện trong video.</p>
 
   <div class="row">
     <div>
@@ -70,7 +71,7 @@ footer{max-width:1200px;padding:0 16px 25px;margin:auto;color:var(--muted);font-
     </div>
     <div>
       <label for="duration">Thời lượng (giây)</label>
-      <input id="duration" type="number" min="3" max="60" value="10">
+      <input id="duration" type="number" min="3" max="180" value="10">
     </div>
   </div>
 
@@ -106,7 +107,7 @@ footer{max-width:1200px;padding:0 16px 25px;margin:auto;color:var(--muted);font-
     <button id="exportBtn" class="primary">⬇ Xuất video WebM</button>
   </div>
   <div id="videoStatus" class="status" role="status"></div>
-  <p class="small">Hiệu ứng hiện tại là chuyển động đồ họa, chưa phải video AI tạo sinh.</p>
+  <p class="small">Các ảnh được chia đều theo thời lượng video. Hiệu ứng là chuyển động đồ họa, chưa phải video AI tạo sinh.</p>
 </section>
 
 <aside class="panel">
@@ -137,11 +138,11 @@ footer{max-width:1200px;padding:0 16px 25px;margin:auto;color:var(--muted);font-
     <button id="pauseMusicBtn">Ⅱ Tạm dừng</button>
   </div>
 
-  <audio id="audioPlayer" preload="metadata" loop></audio>
-  <video id="videoPlayer" preload="metadata" loop playsinline style="display:none"></video>
+  <audio id="audioPlayer" preload="auto" loop></audio>
+  <video id="videoPlayer" preload="auto" loop playsinline style="display:none"></video>
 
-  <p class="small">Với MP4, ứng dụng dùng phần âm thanh của video; hình ảnh video không được đưa vào bản xuất. Một số codec không được trình duyệt hỗ trợ có thể không phát được.</p>
-  <p class="small">Thư viện chỉ lưu trên trình duyệt hiện tại. Xóa dữ liệu trang web có thể làm mất nhạc.</p>
+  <p class="small">Với MP4, ứng dụng lấy phần âm thanh. File phải có âm thanh và codec trình duyệt hỗ trợ.</p>
+  <p class="small">Thư viện chỉ lưu trong trình duyệt hiện tại. Xóa dữ liệu trang web có thể làm mất nhạc.</p>
 </aside>
 </main>
 
@@ -160,22 +161,21 @@ let tracks = [];
 let selectedId = null;
 let selectedKind = null;
 let objectURL = null;
-let uploadedImage = null;
-let imageURL = null;
+let uploadedImages = [];
+let imageURLs = [];
 let animationID = 0;
 let previewStart = 0;
 let previewing = false;
-
-const canvas = $("canvas");
-const ctx = canvas.getContext("2d");
-const audio = $("audioPlayer");
-const video = $("videoPlayer");
-
 let audioContext = null;
 let audioSource = null;
 let videoSource = null;
 let gainNode = null;
 let destination = null;
+
+const canvas = $("canvas");
+const ctx = canvas.getContext("2d");
+const audio = $("audioPlayer");
+const video = $("videoPlayer");
 
 function status(id, message, error = false) {
   $(id).textContent = message;
@@ -198,9 +198,9 @@ function openDB() {
 
     request.onsuccess = () => {
       db = request.result;
+      db.onversionchange = () => db.close();
       resolve(db);
     };
-
     request.onerror = () => reject(request.error);
   });
 }
@@ -210,8 +210,12 @@ function dbRequest(mode, action) {
     if (!db) return reject(new Error("Thư viện chưa sẵn sàng."));
     const transaction = db.transaction(STORE, mode);
     const request = action(transaction.objectStore(STORE));
-
-    transaction.oncomplete = () => resolve(request ? request.result : undefined);
+    let result;
+    if (request) {
+      request.onsuccess = () => { result = request.result; };
+      request.onerror = () => reject(request.error);
+    }
+    transaction.oncomplete = () => resolve(result);
     transaction.onerror = () => reject(transaction.error || new Error("Lỗi cơ sở dữ liệu."));
     transaction.onabort = () => reject(transaction.error || new Error("Thao tác bị hủy."));
   });
@@ -226,12 +230,8 @@ function bytes(size) {
 function kindOf(file) {
   const name = (file.name || "").toLowerCase();
   const type = (file.type || "").toLowerCase();
-
-  if (type.startsWith("video/") ||
-      /\.(mp4|webm|mov|m4v|ogv)$/i.test(name)) {
-    return "video";
-  }
-  return "audio";
+  return type.startsWith("video/") ||
+    /\.(mp4|webm|mov|m4v|ogv)$/i.test(name) ? "video" : "audio";
 }
 
 async function loadLibrary() {
@@ -250,7 +250,6 @@ async function saveFiles(files) {
     status("musicStatus", "Bạn chưa chọn file.", true);
     return;
   }
-
   let saved = 0;
   const supported = /\.(mp3|wav|m4a|aac|ogg|flac|mp4|webm|mov|m4v|ogv)$/i;
 
@@ -258,9 +257,7 @@ async function saveFiles(files) {
     for (const file of files) {
       if (!file.type.startsWith("audio/") &&
           !file.type.startsWith("video/") &&
-          !supported.test(file.name)) {
-        continue;
-      }
+          !supported.test(file.name)) continue;
 
       await dbRequest("readwrite", store => store.add({
         name: file.name,
@@ -275,14 +272,11 @@ async function saveFiles(files) {
     tracks = await dbRequest("readonly", store => store.getAll());
     renderLibrary();
     $("musicInput").value = "";
-
     status("musicStatus", saved
-      ? `Đã lưu ${saved} file. Tải lại trang vẫn còn thư viện.`
+      ? `Đã lưu ${saved} file vào thư viện.`
       : "Không tìm thấy file phù hợp.", !saved);
   } catch (error) {
-    status("musicStatus",
-      "Không lưu được. Có thể dung lượng trình duyệt đã đầy. " + error.message,
-      true);
+    status("musicStatus", "Không lưu được file: " + error.message, true);
   }
 }
 
@@ -310,12 +304,10 @@ function selectTrack(id, autoplay = false) {
   selectedId = id;
   selectedKind = kindOf(track);
   releaseURL();
-
   objectURL = URL.createObjectURL(track.blob);
 
   const player = activePlayer();
   const other = selectedKind === "video" ? audio : video;
-
   other.pause();
   other.removeAttribute("src");
   other.load();
@@ -324,14 +316,12 @@ function selectTrack(id, autoplay = false) {
   player.volume = Number($("volume").value);
   player.onerror = () => status(
     "musicStatus",
-    "Không phát được file. Có thể codec không được hỗ trợ hoặc MP4 không có âm thanh.",
+    "Không phát được file. Hãy thử MP3 hoặc WAV; MP4 có thể không tương thích codec.",
     true
   );
 
   player.onloadedmetadata = () => {
-    status("musicStatus",
-      (selectedKind === "video" ? "Đã chọn video, dùng phần âm thanh: " : "Đã chọn nhạc: ")
-      + track.name);
+    status("musicStatus", "Đã chọn: " + track.name);
   };
 
   renderLibrary();
@@ -373,16 +363,13 @@ function renderLibrary() {
 
     const info = document.createElement("div");
     info.className = "trackName";
-
     const name = document.createElement("div");
     name.textContent = (kind === "video" ? "🎞 " : "🎵 ") + track.name;
 
     const meta = document.createElement("div");
     meta.className = "trackMeta";
-    meta.textContent =
-      (kind === "video" ? "Video — phát âm thanh" : "Âm thanh")
+    meta.textContent = (kind === "video" ? "Video — lấy âm thanh" : "Âm thanh")
       + " · " + bytes(track.size || 0);
-
     info.append(name, meta);
 
     const actions = document.createElement("div");
@@ -392,33 +379,25 @@ function renderLibrary() {
     const play = document.createElement("button");
     play.textContent = "▶";
     play.title = "Chọn và nghe";
-    play.addEventListener("click", () => {
+    play.addEventListener("click", async () => {
       selectTrack(track.id);
-      activePlayer().play().catch(() => {});
+      try {
+        await activePlayer().play();
+        status("musicStatus", "Đang phát: " + track.name);
+      } catch {
+        status("musicStatus", "Không phát được file. Hãy thử MP3 hoặc WAV.", true);
+      }
     });
 
     const remove = document.createElement("button");
     remove.textContent = "✕";
     remove.className = "danger";
     remove.title = "Xóa file";
-
     remove.addEventListener("click", async () => {
       if (!confirm(`Xóa "${track.name}" khỏi thư viện?`)) return;
-
       try {
         await dbRequest("readwrite", store => store.delete(track.id));
-
-        if (selectedId === track.id) {
-          pausePlayers();
-          audio.removeAttribute("src");
-          video.removeAttribute("src");
-          audio.load();
-          video.load();
-          selectedId = null;
-          selectedKind = null;
-          releaseURL();
-        }
-
+        if (selectedId === track.id) clearSelectedTrack();
         tracks = await dbRequest("readonly", store => store.getAll());
         renderLibrary();
         status("musicStatus", "Đã xóa file.");
@@ -433,8 +412,18 @@ function renderLibrary() {
   }
 }
 
-$("importBtn").addEventListener("click", () => saveFiles($("musicInput").files));
+function clearSelectedTrack() {
+  pausePlayers();
+  audio.removeAttribute("src");
+  video.removeAttribute("src");
+  audio.load();
+  video.load();
+  selectedId = null;
+  selectedKind = null;
+  releaseURL();
+}
 
+$("importBtn").addEventListener("click", () => saveFiles($("musicInput").files));
 $("musicInput").addEventListener("change", () => {
   const count = $("musicInput").files.length;
   if (count) status("musicStatus", `Đã chọn ${count} file. Nhấn “Lưu vào thư viện”.`);
@@ -445,19 +434,11 @@ $("clearMusicBtn").addEventListener("click", async () => {
     status("musicStatus", "Thư viện đang trống.");
     return;
   }
-
   if (!confirm("Xóa toàn bộ nhạc đã lưu trên trình duyệt này?")) return;
 
   try {
     await dbRequest("readwrite", store => store.clear());
-    pausePlayers();
-    audio.removeAttribute("src");
-    video.removeAttribute("src");
-    audio.load();
-    video.load();
-    selectedId = null;
-    selectedKind = null;
-    releaseURL();
+    clearSelectedTrack();
     tracks = [];
     renderLibrary();
     status("musicStatus", "Đã xóa toàn bộ thư viện.");
@@ -468,16 +449,14 @@ $("clearMusicBtn").addEventListener("click", async () => {
 
 $("playMusicBtn").addEventListener("click", async () => {
   if (!selectedId && tracks.length) selectTrack(tracks[0].id);
-
   if (!selectedId) {
     status("musicStatus", "Hãy chọn một file trước.", true);
     return;
   }
-
   try {
     await activePlayer().play();
     status("musicStatus", "Đang phát file đã chọn.");
-  } catch (error) {
+  } catch {
     status("musicStatus", "Không phát được file. Hãy kiểm tra định dạng và codec.", true);
   }
 });
@@ -502,42 +481,37 @@ function setCanvasSize() {
     "16:9": [960, 540],
     "1:1": [720, 720]
   };
-
   [canvas.width, canvas.height] = sizes[$("ratio").value];
   drawFrame(0);
 }
 
 function drawFrame(seconds) {
-  const w = canvas.width;
-  const h = canvas.height;
-
+  const w = canvas.width, h = canvas.height;
   ctx.clearRect(0, 0, w, h);
-
   const gradient = ctx.createLinearGradient(0, 0, w, h);
   gradient.addColorStop(0, "#111827");
   gradient.addColorStop(1, "#030712");
   ctx.fillStyle = gradient;
   ctx.fillRect(0, 0, w, h);
 
-  if (uploadedImage) {
-    const iw = uploadedImage.naturalWidth;
-    const ih = uploadedImage.naturalHeight;
+  const duration = Math.max(3, Math.min(180, Number($("duration").value) || 10));
+  const images = uploadedImages;
+  if (images.length) {
+    const perImage = duration / images.length;
+    const safeSeconds = Math.max(0, Math.min(seconds, duration - 0.001));
+    const index = Math.min(images.length - 1, Math.floor(safeSeconds / perImage));
+    const image = images[index];
+    const progress = Math.min(1, Math.max(0, (safeSeconds - index * perImage) / perImage));
+    const iw = image.naturalWidth, ih = image.naturalHeight;
     const cover = $("fit").value === "cover";
-    const base = cover
-      ? Math.max(w / iw, h / ih)
-      : Math.min(w / iw, h / ih);
-
+    const base = cover ? Math.max(w / iw, h / ih) : Math.min(w / iw, h / ih);
     let scale = base;
     let dx = (w - iw * scale) / 2;
     let dy = (h - ih * scale) / 2;
-
     const motion = $("motion").value;
-    const duration = Math.max(3, Number($("duration").value) || 10);
-    const progress = Math.min(1, Math.max(0, seconds / duration));
 
     if (motion === "zoom") scale *= 1 + 0.12 * progress;
     if (motion === "pan") dx += (progress - 0.5) * w * 0.12;
-
     if (motion === "float") {
       dx += Math.sin(progress * Math.PI * 2) * w * 0.025;
       dy += Math.cos(progress * Math.PI * 2) * h * 0.02;
@@ -548,7 +522,7 @@ function drawFrame(seconds) {
     ctx.beginPath();
     ctx.rect(0, 0, w, h);
     ctx.clip();
-    ctx.drawImage(uploadedImage, dx, dy, iw * scale, ih * scale);
+    ctx.drawImage(image, dx, dy, iw * scale, ih * scale);
     ctx.restore();
   } else {
     ctx.fillStyle = "#dbeafe";
@@ -558,30 +532,23 @@ function drawFrame(seconds) {
   }
 
   const headline = $("headline").value.trim();
-
   if (headline) {
     const pad = w * 0.055;
     const maxWidth = w - pad * 2;
     const fontSize = Math.max(22, Math.round(w * 0.065));
-
     ctx.font = `900 ${fontSize}px system-ui, sans-serif`;
     ctx.textAlign = "left";
     ctx.textBaseline = "bottom";
 
     const lines = [];
     let line = "";
-
     for (const word of headline.split(/\s+/)) {
       const test = line ? line + " " + word : word;
-
       if (ctx.measureText(test).width > maxWidth && line) {
         lines.push(line);
         line = word;
-      } else {
-        line = test;
-      }
+      } else line = test;
     }
-
     if (line) lines.push(line);
 
     const lineHeight = fontSize * 1.15;
@@ -592,14 +559,9 @@ function drawFrame(seconds) {
 
     ctx.fillStyle = "rgba(0,0,0,.68)";
     ctx.fillRect(0, y - blockHeight, w, blockHeight);
-
     ctx.fillStyle = "#fff";
     shown.forEach((text, i) => {
-      ctx.fillText(
-        text,
-        pad,
-        y - (shown.length - 1 - i) * lineHeight - pad * 0.2
-      );
+      ctx.fillText(text, pad, y - (shown.length - 1 - i) * lineHeight - pad * 0.2);
     });
   }
 }
@@ -612,38 +574,48 @@ function stopPreview() {
 
 function tick(now) {
   if (!previewing) return;
-
   const elapsed = (now - previewStart) / 1000;
-  const duration = Math.max(3, Math.min(60, Number($("duration").value) || 10));
-
+  const duration = Math.max(3, Math.min(180, Number($("duration").value) || 10));
   drawFrame(elapsed);
-
   if (elapsed >= duration) {
     previewing = false;
     drawFrame(0);
     return;
   }
-
   animationID = requestAnimationFrame(tick);
 }
 
-$("imageInput").addEventListener("change", event => {
-  const file = event.target.files[0];
-  if (!file) return;
+$("imageInput").addEventListener("change", async event => {
+  const files = Array.from(event.target.files || []).filter(file => file.type.startsWith("image/"));
+  if (!files.length) return;
 
-  if (imageURL) URL.revokeObjectURL(imageURL);
-  imageURL = URL.createObjectURL(file);
+  imageURLs.forEach(url => URL.revokeObjectURL(url));
+  imageURLs = [];
+  uploadedImages = [];
+  status("videoStatus", `Đang tải ${files.length} ảnh...`);
 
-  const image = new Image();
+  try {
+    const loaded = await Promise.all(files.map(file => new Promise((resolve, reject) => {
+      const url = URL.createObjectURL(file);
+      imageURLs.push(url);
+      const image = new Image();
+      image.onload = () => resolve({ image, name: file.name });
+      image.onerror = () => {
+        URL.revokeObjectURL(url);
+        reject(new Error("Không đọc được ảnh: " + file.name));
+      };
+      image.src = url;
+    })));
 
-  image.onload = () => {
-    uploadedImage = image;
+    uploadedImages = loaded.map(item => item.image);
     setCanvasSize();
-    status("videoStatus", "Đã tải ảnh: " + file.name);
-  };
-
-  image.onerror = () => status("videoStatus", "Không đọc được ảnh.", true);
-  image.src = imageURL;
+    $("imageStatus").textContent =
+      `Đã tải ${uploadedImages.length} ảnh. Các ảnh sẽ lần lượt xuất hiện trong video.`;
+    status("videoStatus", `Đã tải ${uploadedImages.length} ảnh thành công.`);
+    event.target.value = "";
+  } catch (error) {
+    status("videoStatus", error.message, true);
+  }
 });
 
 ["ratio", "headline", "motion", "fit", "duration"].forEach(id => {
@@ -663,83 +635,133 @@ $("stopBtn").addEventListener("click", () => {
 });
 
 async function getAudioStream() {
-  if (!audioContext) {
-    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-    if (!AudioContextClass) throw new Error("Trình duyệt không hỗ trợ AudioContext.");
+  const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+  if (!AudioContextClass) {
+    throw new Error("Trình duyệt không hỗ trợ xử lý âm thanh. Hãy dùng Chrome hoặc Edge.");
+  }
 
+  if (!audioContext) {
     audioContext = new AudioContextClass();
     gainNode = audioContext.createGain();
     destination = audioContext.createMediaStreamDestination();
-
     gainNode.connect(audioContext.destination);
     gainNode.connect(destination);
   }
 
-  if (audioContext.state === "suspended") await audioContext.resume();
-
+  if (audioContext.state !== "running") await audioContext.resume();
   gainNode.gain.value = Number($("volume").value);
 
+  let player, source;
   if (selectedKind === "video") {
+    player = video;
     if (!videoSource) videoSource = audioContext.createMediaElementSource(video);
-    videoSource.connect(gainNode);
-  } else {
+    source = videoSource;
+  } else if (selectedKind === "audio") {
+    player = audio;
     if (!audioSource) audioSource = audioContext.createMediaElementSource(audio);
-    audioSource.connect(gainNode);
+    source = audioSource;
+  } else {
+    throw new Error("Bạn chưa chọn file nhạc.");
   }
 
+  if (!source.__newsMotionConnected) {
+    source.connect(gainNode);
+    source.__newsMotionConnected = true;
+  }
+
+  if (player.readyState < HTMLMediaElement.HAVE_CURRENT_DATA) {
+    await new Promise((resolve, reject) => {
+      const timeout = setTimeout(() => {
+        cleanup();
+        reject(new Error("Không đọc được âm thanh. Hãy thử MP3 hoặc WAV."));
+      }, 12000);
+
+      const cleanup = () => {
+        clearTimeout(timeout);
+        player.removeEventListener("canplay", onReady);
+        player.removeEventListener("error", onError);
+      };
+      const onReady = () => { cleanup(); resolve(); };
+      const onError = () => {
+        cleanup();
+        reject(new Error("Trình duyệt không hỗ trợ codec của file này."));
+      };
+
+      player.addEventListener("canplay", onReady, { once: true });
+      player.addEventListener("error", onError, { once: true });
+      player.load();
+    });
+  }
+
+  if (!destination.stream.getAudioTracks().length) {
+    throw new Error("Không tạo được luồng âm thanh. Hãy thử MP3 hoặc WAV.");
+  }
   return destination.stream;
 }
 
 $("exportBtn").addEventListener("click", async () => {
-  if (!uploadedImage) {
-    status("videoStatus", "Bạn cần tải ảnh lên trước.", true);
+  if (!uploadedImages.length) {
+    status("videoStatus", "Bạn cần tải ít nhất một ảnh lên trước.", true);
+    return;
+  }
+
+  if (!selectedId && tracks.length) selectTrack(tracks[0].id);
+  if (!selectedId) {
+    status("videoStatus", "Hãy chọn một file nhạc trong thư viện trước khi xuất.", true);
     return;
   }
 
   if (!window.MediaRecorder || !canvas.captureStream) {
-    status("videoStatus", "Hãy thử Chrome hoặc Edge trên máy tính.", true);
+    status("videoStatus", "Hãy thử Chrome hoặc Edge mới nhất trên máy tính.", true);
     return;
   }
 
   const button = $("exportBtn");
   button.disabled = true;
   button.textContent = "Đang xuất...";
-
   let stream = null;
   let recorder = null;
 
   try {
     stopPreview();
-
-    const duration = Math.max(3, Math.min(60, Number($("duration").value) || 10));
+    const duration = Math.max(3, Math.min(180, Number($("duration").value) || 10));
     const canvasStream = canvas.captureStream(30);
-    stream = canvasStream;
+    const player = activePlayer();
 
-    if (selectedId) {
-      const soundStream = await getAudioStream();
-      const player = activePlayer();
+    const soundStream = await getAudioStream();
+    try { player.currentTime = 0; } catch (error) {}
 
-      player.currentTime = 0;
-
-      stream = new MediaStream([
-        ...canvasStream.getVideoTracks(),
-        ...soundStream.getAudioTracks()
-      ]);
-
+    try {
       await player.play();
+    } catch (error) {
+      throw new Error("Không phát được file nhạc. Hãy thử nút ▶; nếu MP4 không có tiếng, dùng MP3/WAV.");
     }
+
+    await new Promise(resolve => setTimeout(resolve, 300));
+    const audioTracks = soundStream.getAudioTracks();
+    if (!audioTracks.length || audioTracks.some(track => track.readyState !== "live")) {
+      throw new Error("Luồng âm thanh chưa sẵn sàng. Hãy thử MP3 hoặc WAV.");
+    }
+
+    stream = new MediaStream([
+      ...canvasStream.getVideoTracks(),
+      ...audioTracks
+    ]);
 
     const formats = [
       "video/webm;codecs=vp9,opus",
       "video/webm;codecs=vp8,opus",
       "video/webm"
     ];
-
     const mimeType = formats.find(type => MediaRecorder.isTypeSupported(type)) || "";
-    recorder = new MediaRecorder(stream, mimeType ? { mimeType } : undefined);
+
+    try {
+      recorder = new MediaRecorder(stream, mimeType ? { mimeType } : undefined);
+    } catch {
+      throw new Error("Trình duyệt không hỗ trợ xuất WebM. Hãy cập nhật Chrome hoặc Edge.");
+    }
 
     const chunks = [];
-
     recorder.ondataavailable = event => {
       if (event.data && event.data.size) chunks.push(event.data);
     };
@@ -750,22 +772,18 @@ $("exportBtn").addEventListener("click", async () => {
     });
 
     recorder.start(250);
-
     const start = performance.now();
 
     await new Promise(resolve => {
       function render(now) {
         const elapsed = (now - start) / 1000;
         drawFrame(Math.min(elapsed, duration));
-
         if (elapsed >= duration) {
           resolve();
           return;
         }
-
         requestAnimationFrame(render);
       }
-
       requestAnimationFrame(render);
     });
 
@@ -773,35 +791,28 @@ $("exportBtn").addEventListener("click", async () => {
     await stopped;
     pausePlayers();
 
-    const blob = new Blob(chunks, {
-      type: recorder.mimeType || "video/webm"
-    });
-
+    const blob = new Blob(chunks, { type: recorder.mimeType || "video/webm" });
     if (!blob.size) throw new Error("File video rỗng. Hãy thử lại.");
 
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
-
     link.href = url;
     link.download = "news-motion-" + Date.now() + ".webm";
-
     document.body.appendChild(link);
     link.click();
     link.remove();
-
     setTimeout(() => URL.revokeObjectURL(url), 60000);
 
-    status("videoStatus", "Xuất video thành công! File đã được tải xuống.");
+    status("videoStatus", "Xuất video hoàn tất. Hãy mở file WebM vừa tải để kiểm tra hình và âm thanh.");
     drawFrame(0);
   } catch (error) {
+    pausePlayers();
     status("videoStatus", "Không xuất được video: " + error.message, true);
   } finally {
     if (recorder && recorder.state !== "inactive") {
       try { recorder.stop(); } catch (error) {}
     }
-
     if (stream) stream.getTracks().forEach(track => track.stop());
-
     button.disabled = false;
     button.textContent = "⬇ Xuất video WebM";
   }
