@@ -9,7 +9,7 @@
 *{box-sizing:border-box}
 body{margin:0;padding:20px;background:#0b1020;color:#eef2ff;font-family:Arial,sans-serif}
 main{max-width:1000px;margin:auto}
-h1{font-size:29px;margin-bottom:6px}
+h1{font-size:29px}
 h2{font-size:20px}
 p{color:#b9c5df;line-height:1.5}
 .panel{padding:18px;margin:16px 0;background:#151e32;border:1px solid #30405e;border-radius:15px}
@@ -18,20 +18,31 @@ label{display:block;font-weight:bold;margin:12px 0 7px}
 input,select,button{width:100%;padding:11px;border-radius:9px;font:inherit}
 input,select{color:white;background:#0a1224;border:1px solid #425170}
 input[type=range]{padding:0}
-button{margin-top:12px;border:0;background:#6c5ce7;color:white;font-weight:bold;cursor:pointer}
+button{margin-top:10px;border:0;background:#6c5ce7;color:white;font-weight:bold;cursor:pointer}
 button:disabled{opacity:.5;cursor:wait}
 .secondary{background:#293955}
+.danger{background:#8c3548;width:auto;padding:8px 12px;margin:0}
 canvas{display:block;width:100%;max-height:650px;object-fit:contain;background:#05070d;border-radius:10px;margin-top:14px}
 audio{width:100%;margin-top:12px}
 .small{font-size:13px;color:#aab8d4}
 .status{padding:12px;border-radius:9px;background:#0a1224;white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.5}
 .download{display:block;margin-top:15px;color:#b9c7ff;font-weight:bold}
+.track{display:flex;align-items:center;gap:10px;padding:12px;background:#0a1224;border:1px solid #30405e;border-radius:10px;margin-top:9px}
+.track-info{flex:1;min-width:0}
+.track-name{font-weight:bold;overflow-wrap:anywhere}
+.track-meta{font-size:12px;color:#aab8d4;margin-top:5px}
+.track-actions{display:flex;gap:6px;align-items:center}
+.track-actions button{width:auto;margin:0;padding:8px 10px}
+.track.selected{border-color:#8a7cff;background:#171a38}
+.track input[type=radio]{width:auto}
+#library{margin-top:10px}
+@media(max-width:520px){body{padding:10px}.panel{padding:13px}.track{flex-wrap:wrap}.track-info{min-width:60%}}
 </style>
 </head>
 <body>
 <main>
 <h1>🎬 News Motion Studio</h1>
-<p>Tạo video từ ảnh, hiệu ứng chuyển động và nhạc nền của bạn.</p>
+<p>Tạo video từ ảnh, chọn nhạc trong thư viện và tải video về máy.</p>
 
 <section class="panel">
 <h2>1. Hình ảnh</h2>
@@ -74,41 +85,41 @@ audio{width:100%;margin-top:12px}
 
 <label for="headline">Tiêu đề (không bắt buộc)</label>
 <input id="headline" maxlength="150" placeholder="Nhập tiêu đề video">
-
 <button id="previewBtn" class="secondary">Xem trước</button>
 <canvas id="canvas" width="720" height="1280"></canvas>
 </section>
 
 <section class="panel">
-<h2>2. Nhạc nền 🎵</h2>
-<p>Chọn file nhạc từ máy tính. Khuyên dùng MP3. Có thể thử WAV, M4A hoặc MP4 có âm thanh.</p>
+<h2>2. Thư viện nhạc 🎵</h2>
+<p>Chọn nhiều file nhạc cùng lúc. Sau khi tải lên, bạn có thể nghe thử và chọn bài dùng cho video.</p>
 
-<label for="musicFile">Chọn file nhạc</label>
-<input id="musicFile" type="file"
+<label for="musicFiles">Thêm nhạc vào thư viện</label>
+<input id="musicFiles" type="file" multiple
 accept="audio/*,video/mp4,.mp3,.wav,.m4a,.aac,.ogg,.opus,.mp4">
 
-<audio id="audioPreview" controls preload="metadata"></audio>
+<p class="small">Khuyên dùng MP3 hoặc WAV. File MP4 chỉ phát được nếu trình duyệt đọc được âm thanh bên trong.</p>
 
-<div class="grid">
-<div>
-<label for="musicStyle">Phong cách</label>
+<div id="library"></div>
+<p id="libraryEmpty" class="small">Chưa có bài nhạc. Hãy chọn file ở phía trên.</p>
+
+<label for="volume">Âm lượng: <span id="volumeLabel">50%</span></label>
+<input id="volume" type="range" min="0" max="100" value="50">
+
+<label for="musicStyle">Nhãn phong cách</label>
 <select id="musicStyle">
 <option value="dramatic">Kịch tính — Dramatic</option>
 <option value="emotional">Cảm xúc — Emotional</option>
+<option value="news">Bản tin — News</option>
 <option value="custom">Nhạc của tôi</option>
 </select>
-<p class="small">Chọn phong cách chỉ là nhãn; ứng dụng sử dụng file nhạc bạn tải lên.</p>
-</div>
-<div>
-<label for="volume">Âm lượng: <span id="volumeLabel">50%</span></label>
-<input id="volume" type="range" min="0" max="100" value="50">
-</div>
-</div>
+
+<audio id="audioPreview" controls preload="metadata"></audio>
+<button id="stopPreview" class="secondary">Dừng nghe thử</button>
 </section>
 
 <section class="panel">
-<h2>3. Tạo và tải video</h2>
-<p class="small">Ứng dụng sẽ ghi hình từ canvas và trộn nhạc qua luồng âm thanh của trình duyệt.</p>
+<h2>3. Xuất video</h2>
+<p class="small">Video được ghi bằng trình duyệt. Hãy giữ trang mở cho đến khi xuất xong.</p>
 <button id="renderBtn">🎥 Tạo video có nhạc</button>
 <div id="status" class="status" role="status">Sẵn sàng. Hãy chọn ảnh để bắt đầu.</div>
 <a id="downloadLink" class="download" hidden></a>
@@ -123,33 +134,225 @@ const $ = id => document.getElementById(id);
 const canvas = $("canvas");
 const ctx = canvas.getContext("2d");
 const imageInput = $("imageFile");
-const musicInput = $("musicFile");
+const musicFiles = $("musicFiles");
 const audio = $("audioPreview");
+const library = $("library");
+const libraryEmpty = $("libraryEmpty");
 const renderBtn = $("renderBtn");
 const statusBox = $("status");
 const downloadLink = $("downloadLink");
 
 let image = null;
 let imageURL = null;
-let musicURL = null;
 let audioContext = null;
 let audioSource = null;
 let gainNode = null;
-let destination = null;
+let audioDestination = null;
 let busy = false;
+let selectedMusicId = null;
+let musicItems = [];
+let nextMusicId = 1;
 let lastDownloadURL = null;
 
 function say(message) {
   statusBox.textContent = message;
 }
 
+function formatSize(bytes) {
+  if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(0) + " KB";
+  return (bytes / (1024 * 1024)).toFixed(1) + " MB";
+}
+
+function selectedMusic() {
+  return musicItems.find(item => item.id === selectedMusicId) || null;
+}
+
+function renderLibrary() {
+  library.replaceChildren();
+  libraryEmpty.hidden = musicItems.length > 0;
+
+  musicItems.forEach(item => {
+    const row = document.createElement("div");
+    row.className = "track" + (item.id === selectedMusicId ? " selected" : "");
+
+    const radio = document.createElement("input");
+    radio.type = "radio";
+    radio.name = "selectedMusic";
+    radio.checked = item.id === selectedMusicId;
+    radio.setAttribute("aria-label", "Chọn " + item.name);
+
+    radio.addEventListener("change", () => selectMusic(item.id));
+
+    const info = document.createElement("div");
+    info.className = "track-info";
+
+    const name = document.createElement("div");
+    name.className = "track-name";
+    name.textContent = item.name;
+
+    const meta = document.createElement("div");
+    meta.className = "track-meta";
+    meta.textContent = formatSize(item.size) +
+      (item.duration ? " · " + formatTime(item.duration) : "");
+
+    info.append(name, meta);
+
+    const actions = document.createElement("div");
+    actions.className = "track-actions";
+
+    const play = document.createElement("button");
+    play.className = "secondary";
+    play.type = "button";
+    play.textContent = item.id === selectedMusicId && !audio.paused
+      ? "Đang phát" : "▶ Nghe";
+    play.addEventListener("click", () => {
+      selectMusic(item.id);
+      audio.play().then(() => renderLibrary()).catch(() => {
+        say("Không phát được file này. Hãy thử chuyển sang MP3.");
+      });
+    });
+
+    const remove = document.createElement("button");
+    remove.className = "danger";
+    remove.type = "button";
+    remove.textContent = "Xóa";
+    remove.addEventListener("click", () => removeMusic(item.id));
+
+    actions.append(play, remove);
+    row.append(radio, info, actions);
+    library.append(row);
+  });
+}
+
+function formatTime(seconds) {
+  if (!Number.isFinite(seconds)) return "";
+  const m = Math.floor(seconds / 60);
+  const s = Math.floor(seconds % 60).toString().padStart(2, "0");
+  return m + ":" + s;
+}
+
+function selectMusic(id) {
+  const item = musicItems.find(track => track.id === id);
+  if (!item) return;
+
+  const wasPlaying = !audio.paused;
+  selectedMusicId = id;
+
+  audio.pause();
+  audio.src = item.url;
+  audio.load();
+  audio.volume = Number($("volume").value) / 100;
+
+  renderLibrary();
+  say("Đã chọn nhạc: " + item.name);
+
+  if (wasPlaying) {
+    audio.play().catch(() => {
+      say("Đã chọn nhạc. Bấm Play để nghe thử.");
+    });
+  }
+}
+
+function removeMusic(id) {
+  const index = musicItems.findIndex(item => item.id === id);
+  if (index < 0) return;
+
+  const item = musicItems[index];
+  const wasSelected = item.id === selectedMusicId;
+
+  if (wasSelected) {
+    audio.pause();
+    audio.removeAttribute("src");
+    audio.load();
+    selectedMusicId = null;
+  }
+
+  URL.revokeObjectURL(item.url);
+  musicItems.splice(index, 1);
+
+  if (wasSelected && musicItems.length) {
+    selectMusic(musicItems[0].id);
+  } else {
+    renderLibrary();
+  }
+
+  say("Đã xóa nhạc khỏi thư viện hiện tại.");
+}
+
+musicFiles.addEventListener("change", () => {
+  const files = Array.from(musicFiles.files || []);
+  let added = 0;
+
+  for (const file of files) {
+    const looksAudio = file.type.startsWith("audio/") ||
+      /\.(mp3|wav|m4a|aac|ogg|opus|mp4)$/i.test(file.name);
+
+    if (!looksAudio) continue;
+
+    const duplicate = musicItems.some(item =>
+      item.name === file.name &&
+      item.size === file.size &&
+      item.lastModified === file.lastModified
+    );
+
+    if (duplicate) continue;
+
+    musicItems.push({
+      id: nextMusicId++,
+      name: file.name,
+      size: file.size,
+      lastModified: file.lastModified,
+      url: URL.createObjectURL(file),
+      duration: null
+    });
+    added++;
+  }
+
+  renderLibrary();
+
+  if (!selectedMusicId && musicItems.length) {
+    selectMusic(musicItems[0].id);
+  }
+
+  say(added
+    ? "Đã thêm " + added + " file vào thư viện nhạc."
+    : "Không có file mới được thêm. Hãy chọn MP3, WAV hoặc định dạng âm thanh được hỗ trợ.");
+
+  // Cho phép chọn lại cùng file ở lần sau.
+  musicFiles.value = "";
+});
+
+audio.addEventListener("loadedmetadata", () => {
+  const item = selectedMusic();
+  if (item && Number.isFinite(audio.duration)) {
+    item.duration = audio.duration;
+    renderLibrary();
+  }
+});
+
+audio.addEventListener("error", () => {
+  if (selectedMusic()) {
+    say("Không phát được file nhạc này. Nếu là MP4, hãy thử chuyển sang MP3.");
+  }
+});
+
+audio.addEventListener("play", renderLibrary);
+audio.addEventListener("pause", renderLibrary);
+
+$("stopPreview").addEventListener("click", () => {
+  audio.pause();
+  try { audio.currentTime = 0; } catch (_) {}
+  renderLibrary();
+  say("Đã dừng nghe thử.");
+});
+
 function getDimensions() {
   const [rw, rh] = $("ratio").value.split(":").map(Number);
   const maxSide = 1280;
-  if (rw >= rh) {
-    return { width: maxSide, height: Math.round(maxSide * rh / rw) };
-  }
-  return { width: Math.round(maxSide * rw / rh), height: maxSide };
+
+  return rw >= rh
+    ? { width: maxSide, height: Math.round(maxSide * rh / rw) }
+    : { width: Math.round(maxSide * rw / rh), height: maxSide };
 }
 
 function fitCanvas() {
@@ -182,24 +385,12 @@ function drawFrame(progress) {
   const shift = progress * 0.10;
 
   switch ($("motion").value) {
-    case "zoom":
-      scale *= 1 + shift;
-      break;
-    case "out":
-      scale *= 1.10 - shift;
-      break;
-    case "left":
-      x -= w * shift;
-      break;
-    case "right":
-      x += w * shift;
-      break;
-    case "up":
-      y -= h * shift;
-      break;
-    case "down":
-      y += h * shift;
-      break;
+    case "zoom": scale *= 1 + shift; break;
+    case "out": scale *= 1.10 - shift; break;
+    case "left": x -= w * shift; break;
+    case "right": x += w * shift; break;
+    case "up": y -= h * shift; break;
+    case "down": y += h * shift; break;
   }
 
   ctx.save();
@@ -219,6 +410,7 @@ function drawFrame(progress) {
 
     const lines = [];
     let line = "";
+
     for (const word of title.split(/\s+/)) {
       const candidate = line ? line + " " + word : word;
       if (line && ctx.measureText(candidate).width > maxWidth) {
@@ -234,13 +426,14 @@ function drawFrame(progress) {
     const blockHeight = lines.length * lineHeight;
     const top = h - blockHeight - h * 0.08;
 
-    ctx.fillStyle = "rgba(0,0,0,0.72)";
+    ctx.fillStyle = "rgba(0,0,0,.72)";
     ctx.fillRect(0, top - fontSize * 0.6,
       w, blockHeight + fontSize * 1.2);
 
     ctx.fillStyle = "#fff";
     ctx.textAlign = "center";
     ctx.textBaseline = "top";
+
     lines.forEach((text, i) => {
       ctx.fillText(text, w / 2, top + i * lineHeight, maxWidth);
     });
@@ -258,39 +451,19 @@ imageInput.addEventListener("change", () => {
   nextImage.onload = () => {
     image = nextImage;
     fitCanvas();
-    say("Đã tải ảnh. Bạn có thể tạo video.");
+    say("Đã tải ảnh. Chọn nhạc trong thư viện rồi tạo video.");
   };
   nextImage.onerror = () => say("Không đọc được ảnh. Hãy thử JPG hoặc PNG.");
   nextImage.src = imageURL;
-});
-
-musicInput.addEventListener("change", () => {
-  const file = musicInput.files && musicInput.files[0];
-  if (!file) return;
-
-  if (musicURL) URL.revokeObjectURL(musicURL);
-  musicURL = URL.createObjectURL(file);
-
-  audio.pause();
-  audio.src = musicURL;
-  audio.load();
-
-  audio.onloadedmetadata = () => {
-    say("Đã tải file nhạc. Bấm Play để nghe thử.");
-  };
-  audio.onerror = () => {
-    say("Không đọc được file này. Nếu là MP4, hãy thử chuyển sang MP3.");
-  };
 });
 
 $("volume").addEventListener("input", () => {
   const volume = Number($("volume").value) / 100;
   $("volumeLabel").textContent = Math.round(volume * 100) + "%";
   audio.volume = volume;
+
   if (gainNode) gainNode.gain.value = volume;
 });
-
-audio.volume = 0.5;
 
 $("ratio").addEventListener("change", fitCanvas);
 $("motion").addEventListener("change", () => drawFrame(0));
@@ -298,32 +471,29 @@ $("headline").addEventListener("input", () => drawFrame(0));
 
 $("previewBtn").addEventListener("click", () => {
   drawFrame(0.5);
-  say("Đang hiển thị khung xem trước.");
+  say("Đang hiển thị bản xem trước.");
 });
 
 async function prepareAudio() {
-  if (!musicInput.files || !musicInput.files[0]) {
-    return null;
-  }
+  const item = selectedMusic();
+  if (!item) return null;
 
   const AudioContextClass =
     window.AudioContext || window.webkitAudioContext;
 
   if (!AudioContextClass) {
-    throw new Error("Trình duyệt không hỗ trợ AudioContext.");
+    throw new Error("Trình duyệt không hỗ trợ xử lý âm thanh.");
   }
 
   if (!audioContext) {
     audioContext = new AudioContextClass();
-
-    // Chỉ tạo MediaElementSource một lần cho audio element.
     audioSource = audioContext.createMediaElementSource(audio);
     gainNode = audioContext.createGain();
-    destination = audioContext.createMediaStreamDestination();
+    audioDestination = audioContext.createMediaStreamDestination();
 
     audioSource.connect(gainNode);
     gainNode.connect(audioContext.destination);
-    gainNode.connect(destination);
+    gainNode.connect(audioDestination);
   }
 
   await audioContext.resume();
@@ -334,21 +504,45 @@ async function prepareAudio() {
 
   gainNode.gain.value = Number($("volume").value) / 100;
 
-  if (!destination.stream.getAudioTracks().length) {
-    throw new Error("Không tạo được track âm thanh.");
-  }
+  const track = audioDestination.stream.getAudioTracks()[0];
+  if (!track) throw new Error("Không tạo được track âm thanh.");
 
-  return destination.stream.getAudioTracks()[0];
+  return track;
 }
 
-function chooseWebMType() {
-  const options = [
+function chooseMimeType() {
+  const candidates = [
     "video/webm;codecs=vp8,opus",
     "video/webm;codecs=vp9,opus",
     "video/webm"
   ];
+  return candidates.find(type => MediaRecorder.isTypeSupported(type)) || "";
+}
 
-  return options.find(type => MediaRecorder.isTypeSupported(type)) || "";
+function waitForAudioReady() {
+  return new Promise((resolve, reject) => {
+    if (audio.readyState >= 2) {
+      resolve();
+      return;
+    }
+
+    const ready = () => {
+      cleanup();
+      resolve();
+    };
+    const failed = () => {
+      cleanup();
+      reject(new Error("Không đọc được bài nhạc đã chọn."));
+    };
+    const cleanup = () => {
+      audio.removeEventListener("canplay", ready);
+      audio.removeEventListener("error", failed);
+    };
+
+    audio.addEventListener("canplay", ready, { once: true });
+    audio.addEventListener("error", failed, { once: true });
+    audio.load();
+  });
 }
 
 renderBtn.addEventListener("click", async () => {
@@ -360,7 +554,7 @@ renderBtn.addEventListener("click", async () => {
   }
 
   if (!window.MediaRecorder || !canvas.captureStream) {
-    say("Hãy dùng Chrome hoặc Edge bản mới để xuất video.");
+    say("Hãy sử dụng Chrome hoặc Edge phiên bản mới.");
     return;
   }
 
@@ -372,61 +566,37 @@ renderBtn.addEventListener("click", async () => {
   let canvasStream = null;
   let outputStream = null;
   let animationId = null;
-  let recorderStopped = false;
   const chunks = [];
 
   try {
     const duration = Number($("duration").value);
-    const mimeType = chooseWebMType();
+    const item = selectedMusic();
+    const mimeType = chooseMimeType();
 
     if (!mimeType) {
-      throw new Error("Trình duyệt không hỗ trợ ghi WebM.");
+      throw new Error("Trình duyệt không hỗ trợ xuất WebM.");
     }
 
     canvasStream = canvas.captureStream(30);
     const tracks = [...canvasStream.getVideoTracks()];
 
-    const audioTrack = await prepareAudio();
-    const hasMusic = Boolean(audioTrack);
-
-    if (hasMusic) {
-      // Đưa nhạc về đầu và bắt đầu phát.
-      audio.pause();
-      try {
-        audio.currentTime = 0;
-      } catch (_) {}
-
-      await new Promise((resolve, reject) => {
-        if (audio.readyState >= 2) {
-          resolve();
-          return;
-        }
-
-        const onReady = () => {
-          cleanup();
-          resolve();
-        };
-        const onError = () => {
-          cleanup();
-          reject(new Error("Không thể đọc file nhạc."));
-        };
-        const cleanup = () => {
-          audio.removeEventListener("canplay", onReady);
-          audio.removeEventListener("error", onError);
-        };
-
-        audio.addEventListener("canplay", onReady, { once: true });
-        audio.addEventListener("error", onError, { once: true });
+    if (item) {
+      // Nạp bài đang chọn vào trình phát.
+      if (audio.src !== item.url) {
+        audio.pause();
+        audio.src = item.url;
         audio.load();
-      });
+      }
 
+      await waitForAudioReady();
+      const audioTrack = await prepareAudio();
       tracks.push(audioTrack);
     }
 
     outputStream = new MediaStream(tracks);
 
-    if (hasMusic && outputStream.getAudioTracks().length === 0) {
-      throw new Error("Không có track âm thanh trong video.");
+    if (item && outputStream.getAudioTracks().length === 0) {
+      throw new Error("Video chưa có track âm thanh.");
     }
 
     recorder = new MediaRecorder(outputStream, {
@@ -444,18 +614,18 @@ renderBtn.addEventListener("click", async () => {
       recorder.onerror = event => {
         reject(event.error || new Error("Lỗi ghi video."));
       };
-      recorder.onstop = () => {
-        recorderStopped = true;
-        resolve();
-      };
+      recorder.onstop = resolve;
     });
 
-    // Ghi video trước, sau đó phát nhạc để track âm thanh có dữ liệu.
+    audio.pause();
+    if (item) {
+      try { audio.currentTime = 0; } catch (_) {}
+    }
+
+    // Bắt đầu ghi trước khi phát nhạc.
     recorder.start(1000);
 
-    if (hasMusic) {
-      await audio.play();
-    }
+    if (item) await audio.play();
 
     const start = performance.now();
 
@@ -479,7 +649,6 @@ renderBtn.addEventListener("click", async () => {
       animationId = requestAnimationFrame(frame);
     });
 
-    // Chờ thêm để recorder nhận khung hình cuối.
     await new Promise(resolve => setTimeout(resolve, 300));
 
     if (recorder.state !== "inactive") recorder.stop();
@@ -489,7 +658,10 @@ renderBtn.addEventListener("click", async () => {
       throw new Error("Không ghi được dữ liệu video.");
     }
 
-    const blob = new Blob(chunks, { type: recorder.mimeType || mimeType });
+    const blob = new Blob(chunks, {
+      type: recorder.mimeType || mimeType
+    });
+
     if (!blob.size) throw new Error("File video rỗng.");
 
     if (lastDownloadURL) URL.revokeObjectURL(lastDownloadURL);
@@ -501,19 +673,17 @@ renderBtn.addEventListener("click", async () => {
     downloadLink.hidden = false;
 
     say(
-      "Hoàn tất! Video WEBM đã được tạo." +
-      (hasMusic
-        ? " Âm thanh đã được kết nối vào luồng ghi."
-        : " Bạn chưa chọn file nhạc.")
+      "Hoàn tất! Đã tạo video WEBM." +
+      (item ? "\nNhạc đã chọn: " + item.name : "\nVideo không có nhạc vì chưa chọn bài.")
     );
 
   } catch (error) {
-    say("Lỗi: " + (error.message || String(error)) +
-      "\nHãy thử lại với file nhạc MP3.");
+    say("Không xuất được video: " + (error.message || String(error)) +
+      "\nNếu file nhạc là MP4, hãy thử dùng MP3.");
   } finally {
     if (animationId) cancelAnimationFrame(animationId);
 
-    if (recorder && !recorderStopped && recorder.state !== "inactive") {
+    if (recorder && recorder.state !== "inactive") {
       try { recorder.stop(); } catch (_) {}
     }
 
@@ -521,18 +691,25 @@ renderBtn.addEventListener("click", async () => {
       canvasStream.getTracks().forEach(track => track.stop());
     }
 
+    // Chỉ dừng track hình; giữ track âm thanh để dùng lại lần sau.
     if (outputStream) {
       outputStream.getVideoTracks().forEach(track => track.stop());
     }
 
     audio.pause();
-
     busy = false;
     renderBtn.disabled = false;
   }
 });
 
+window.addEventListener("beforeunload", () => {
+  if (imageURL) URL.revokeObjectURL(imageURL);
+  musicItems.forEach(item => URL.revokeObjectURL(item.url));
+  if (lastDownloadURL) URL.revokeObjectURL(lastDownloadURL);
+});
+
 fitCanvas();
+renderLibrary();
 })();
 </script>
 </body>
