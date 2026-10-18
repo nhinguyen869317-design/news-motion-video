@@ -3,1058 +3,390 @@
 <html lang="vi">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>News Motion Studio</title>
-
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700;900&family=Montserrat:wght@400;600;700;800;900&family=Bebas+Neue&family=Oswald:wght@400;500;600;700&family=Anton&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet">
-
 <style>
-:root {
-  --bg: #0b1020;
-  --panel: #151d30;
-  --panel2: #1c2740;
-  --text: #f3f6ff;
-  --muted: #9eabc5;
-  --accent: #58a6ff;
-  --border: #2b3854;
-}
-* { box-sizing: border-box; }
-body {
-  margin: 0;
-  background: var(--bg);
-  color: var(--text);
-  font-family: Arial, sans-serif;
-}
-header {
-  padding: 20px;
-  border-bottom: 1px solid var(--border);
-  background: #10182a;
-}
-header h1 { margin: 0 0 6px; font-size: 24px; }
-header p { margin: 0; color: var(--muted); font-size: 13px; }
-main {
-  max-width: 1400px;
-  padding: 18px;
-  margin: auto;
-  display: grid;
-  grid-template-columns: minmax(280px, 380px) minmax(0, 1fr);
-  gap: 18px;
-}
-.panel {
-  background: var(--panel);
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  padding: 16px;
-  margin-bottom: 16px;
-  min-width: 0;
-}
-h2 { font-size: 16px; margin: 0 0 14px; }
-label {
-  display: block;
-  font-size: 12px;
-  color: var(--muted);
-  margin: 12px 0 6px;
-}
-input, select, textarea, button {
-  font: inherit;
-}
-input[type="text"], input[type="number"], select, textarea {
-  width: 100%;
-  padding: 10px;
-  color: var(--text);
-  background: #0e1627;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  outline: none;
-}
-input[type="color"] {
-  width: 48px;
-  height: 38px;
-  padding: 3px;
-  background: #0e1627;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-}
-input[type="range"] { width: 100%; accent-color: var(--accent); }
-input[type="checkbox"] { accent-color: var(--accent); }
-input[type="file"] {
-  width: 100%;
-  color: var(--muted);
-  font-size: 12px;
-}
-.row { display: flex; gap: 10px; align-items: center; }
-.row > * { min-width: 0; flex: 1; }
-.checkrow {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 12px;
-  color: var(--text);
-  margin: 10px 0;
-}
-button {
-  cursor: pointer;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 10px 12px;
-  background: var(--panel2);
-  color: var(--text);
-}
-button.primary {
-  background: var(--accent);
-  color: #061324;
-  border-color: var(--accent);
-  font-weight: 700;
-}
-button:disabled { opacity: .5; cursor: not-allowed; }
-.small { color: var(--muted); font-size: 11px; line-height: 1.5; }
-.actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
-.actions button { flex: 1; }
-#previewWrap {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 14px;
-  background: #050914;
-  border-radius: 12px;
-  min-height: 250px;
-  overflow: hidden;
-}
-canvas {
-  display: block;
-  max-width: 100%;
-  max-height: 70vh;
-  width: auto;
-  height: auto;
-  background: #000;
-  border-radius: 4px;
-}
-#status {
-  color: var(--muted);
-  font-size: 12px;
-  margin-top: 10px;
-  white-space: pre-wrap;
-}
-.track {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 9px;
-  margin-top: 7px;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  font-size: 12px;
-  overflow-wrap: anywhere;
-}
-.track.selected { border-color: var(--accent); background: #182b47; }
-.track .trackname { flex: 1; }
-.track button { padding: 6px 8px; font-size: 11px; }
-#progress { width: 100%; margin-top: 12px; }
-#headlineSample {
-  padding: 10px;
-  margin-top: 12px;
-  background: #080d18;
-  border-radius: 8px;
-  text-align: center;
-  overflow-wrap: anywhere;
-}
-.hidden { display: none !important; }
-@media (max-width: 850px) {
-  main { grid-template-columns: 1fr; padding: 10px; }
-  #previewWrap { min-height: 180px; }
-  canvas { max-height: 60vh; }
-}
+:root{--bg:#0b1020;--panel:#151d30;--panel2:#1c2740;--text:#f3f6ff;--muted:#9eabc5;--accent:#58a6ff;--border:#2b3854}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:Arial,sans-serif}
+header{padding:20px;border-bottom:1px solid var(--border);background:#10182a}header h1{margin:0 0 6px;font-size:24px}header p{margin:0;color:var(--muted);font-size:13px}
+main{max-width:1400px;padding:18px;margin:auto;display:grid;grid-template-columns:minmax(280px,390px) minmax(0,1fr);gap:18px}
+.panel{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:16px;min-width:0}
+h2{font-size:16px;margin:0 0 14px}label{display:block;font-size:12px;color:var(--muted);margin:12px 0 6px}
+input,select,textarea,button{font:inherit}input[type=text],input[type=number],select,textarea{width:100%;padding:10px;color:var(--text);background:#0e1627;border:1px solid var(--border);border-radius:8px;outline:none}
+input[type=color]{width:48px;height:38px;padding:3px;background:#0e1627;border:1px solid var(--border);border-radius:8px}input[type=range]{width:100%;accent-color:var(--accent)}input[type=checkbox]{accent-color:var(--accent)}input[type=file]{width:100%;color:var(--muted);font-size:12px}
+.row{display:flex;gap:10px;align-items:center}.row>*{min-width:0;flex:1}.checkrow{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text);margin:10px 0}
+button{cursor:pointer;border:1px solid var(--border);border-radius:8px;padding:10px 12px;background:var(--panel2);color:var(--text)}button.primary{background:var(--accent);color:#061324;border-color:var(--accent);font-weight:700}button:disabled{opacity:.5;cursor:not-allowed}
+.small{color:var(--muted);font-size:11px;line-height:1.5}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.actions button{flex:1}
+#previewWrap{display:flex;align-items:center;justify-content:center;padding:14px;background:#050914;border-radius:12px;min-height:250px;overflow:hidden}
+canvas{display:block;max-width:100%;max-height:70vh;width:auto;height:auto;background:#000;border-radius:4px}
+#status{color:var(--muted);font-size:12px;margin-top:10px;white-space:pre-wrap;overflow-wrap:anywhere}
+.track{display:flex;align-items:center;gap:8px;padding:9px;margin-top:7px;border:1px solid var(--border);border-radius:8px;font-size:12px;overflow-wrap:anywhere}.track.selected{border-color:var(--accent);background:#182b47}.trackname{flex:1;min-width:0}.track button{padding:6px 8px;font-size:11px;flex:0 0 auto}
+#progress{width:100%;margin-top:12px}#headlineSample{padding:10px;margin-top:12px;background:#080d18;border-radius:8px;overflow-wrap:anywhere;white-space:pre-wrap}
+.hidden{display:none!important}
+@media(max-width:850px){main{grid-template-columns:1fr;padding:10px}#previewWrap{min-height:180px}canvas{max-height:60vh}}
 </style>
 </head>
-
 <body>
-<header>
-  <h1>🎬 News Motion Studio</h1>
-  <p>Dựng video tin tức từ ảnh, thêm tiêu đề, nhạc nền và xuất video WebM.</p>
-</header>
-
+<header><h1>🎬 News Motion Studio</h1><p>Dựng video từ ảnh, thêm tiêu đề, dùng file MP4 làm nguồn âm thanh và xuất video WebM.</p></header>
 <main>
 <section>
-  <div class="panel">
-    <h2>1. Hình ảnh video</h2>
-    <label>Chọn một hoặc nhiều ảnh</label>
-    <input id="imageInput" type="file" accept="image/*" multiple>
+<div class="panel">
+<h2>1. Hình ảnh video</h2>
+<label>Chọn một hoặc nhiều ảnh</label><input id="imageInput" type="file" accept="image/*" multiple>
+<div class="row"><div><label>Tỷ lệ video</label><select id="ratio"><option value="9:16">9:16 — TikTok / Reels</option><option value="16:9">16:9 — YouTube</option><option value="1:1">1:1 — Vuông</option><option value="4:5">4:5 — Facebook</option></select></div>
+<div><label>Độ phân giải</label><select id="resolution"><option value="720">720p</option><option value="1080" selected>1080p</option></select></div></div>
+<label>Thời lượng video (giây)</label><input id="duration" type="number" min="3" max="180" value="10">
+<label>Chuyển động ảnh</label><select id="motion"><option value="zoom">Zoom nhẹ</option><option value="pan">Pan ngang</option><option value="float">Zoom và trôi nhẹ</option><option value="none">Không chuyển động</option></select>
+<label>Cách hiển thị ảnh</label><select id="fit"><option value="cover">Lấp đầy khung hình (Cover)</option><option value="contain">Hiển thị toàn bộ ảnh (Contain)</option></select>
+<p class="small">Khi chọn nhiều ảnh, thời lượng được chia đều. Đây là chuyển động dựng từ ảnh, không phải AI tạo chuyển động thực.</p>
+</div>
 
-    <div class="row">
-      <div>
-        <label>Tỷ lệ video</label>
-        <select id="ratio">
-          <option value="9:16">9:16 — TikTok / Reels</option>
-          <option value="16:9">16:9 — YouTube</option>
-          <option value="1:1">1:1 — Vuông</option>
-          <option value="4:5">4:5 — Facebook</option>
-        </select>
-      </div>
-      <div>
-        <label>Độ phân giải</label>
-        <select id="resolution">
-          <option value="720">720p</option>
-          <option value="1080" selected>1080p</option>
-        </select>
-      </div>
-    </div>
+<div class="panel">
+<h2>2. Tiêu đề video</h2>
+<label>Nội dung tiêu đề</label><textarea id="headline" rows="3" placeholder="Nhập tiêu đề...">BREAKING NEWS: WHAT HAPPENS NEXT?</textarea>
+<div class="row"><div><label>Kiểu chữ</label><select id="font"><option value="Arial">Arial</option><option value="Roboto">Roboto</option><option value="Montserrat">Montserrat</option><option value="Bebas Neue">Bebas Neue</option><option value="Oswald">Oswald</option><option value="Anton">Anton</option><option value="Impact">Impact</option><option value="Georgia">Georgia</option><option value="Playfair Display">Playfair Display</option><option value="Verdana">Verdana</option><option value="Trebuchet MS">Trebuchet MS</option><option value="Times New Roman">Times New Roman</option></select></div>
+<div><label>Độ đậm</label><select id="fontWeight"><option value="400">Thường</option><option value="700">Đậm</option><option value="900" selected>Rất đậm</option></select></div></div>
+<div class="row"><div><label>Cỡ chữ: <span id="fontSizeValue">48</span></label><input id="fontSize" type="range" min="18" max="100" value="48"></div><div><label>Màu chữ</label><input id="fontColor" type="color" value="#ffffff"></div></div>
+<label>Kiểu hiển thị</label><select id="headlineStyle"><option value="bar">Thanh nền đen bán trong suốt</option><option value="plain">Chữ trực tiếp trên ảnh</option></select>
+<div class="row"><div><label>Độ dày viền chữ</label><input id="outlineWidth" type="range" min="0" max="8" value="3"></div><div><label>Độ trong suốt nền: <span id="opacityValue">70%</span></label><input id="barOpacity" type="range" min="0" max="100" value="70"></div></div>
+<div class="row"><div><label>Lề dưới: <span id="bottomValue">7%</span></label><input id="bottomMargin" type="range" min="2" max="18" value="7"></div><div><label>Căn chữ</label><select id="alignment"><option value="center">Căn giữa</option><option value="left">Căn trái</option><option value="right">Căn phải</option></select></div></div>
+<label>Độ rộng vùng tiêu đề: <span id="widthValue">90%</span></label><input id="headlineWidth" type="range" min="50" max="100" value="90">
+<label class="checkrow"><input id="shadow" type="checkbox" checked>Bật bóng chữ</label>
+<label class="checkrow"><input id="uppercase" type="checkbox" checked>Viết HOA toàn bộ tiêu đề</label>
+<div id="headlineSample">BREAKING NEWS: WHAT HAPPENS NEXT?</div>
+<p class="small">Tiêu đề nằm ở phía dưới video. Khi xuất, chữ và nền được vẽ trực tiếp vào khung hình.</p>
+</div>
 
-    <label>Thời lượng video (giây)</label>
-    <input id="duration" type="number" min="3" max="180" value="10">
-
-    <label>Chuyển động ảnh</label>
-    <select id="motion">
-      <option value="zoom">Zoom nhẹ</option>
-      <option value="pan">Pan ngang</option>
-      <option value="float">Zoom và trôi nhẹ</option>
-      <option value="none">Không chuyển động</option>
-    </select>
-
-    <label>Cách hiển thị ảnh</label>
-    <select id="fit">
-      <option value="cover">Lấp đầy khung hình (Cover)</option>
-      <option value="contain">Hiển thị toàn bộ ảnh (Contain)</option>
-    </select>
-
-    <p class="small">Nếu chọn nhiều ảnh, các ảnh sẽ được chia đều thời lượng video. Chuyển động là hiệu ứng dựng từ ảnh, không phải AI tạo chuyển động thực.</p>
-  </div>
-
-  <div class="panel">
-    <h2>2. Tiêu đề video</h2>
-
-    <label>Nội dung tiêu đề</label>
-    <textarea id="headline" rows="3" placeholder="Enter your headline here...">BREAKING NEWS: WHAT HAPPENS NEXT?</textarea>
-
-    <div class="row">
-      <div>
-        <label>Kiểu chữ (Font)</label>
-        <select id="font">
-          <option value="Arial">Arial</option>
-          <option value="Roboto">Roboto</option>
-          <option value="Montserrat">Montserrat</option>
-          <option value="Bebas Neue">Bebas Neue</option>
-          <option value="Oswald">Oswald</option>
-          <option value="Anton">Anton</option>
-          <option value="Impact">Impact</option>
-          <option value="Georgia">Georgia</option>
-          <option value="Playfair Display">Playfair Display</option>
-          <option value="Verdana">Verdana</option>
-          <option value="Trebuchet MS">Trebuchet MS</option>
-          <option value="Times New Roman">Times New Roman</option>
-        </select>
-      </div>
-      <div>
-        <label>Độ đậm</label>
-        <select id="fontWeight">
-          <option value="700">Đậm</option>
-          <option value="400">Thường</option>
-          <option value="900" selected>Rất đậm</option>
-        </select>
-      </div>
-    </div>
-
-    <div class="row">
-      <div>
-        <label>Cỡ chữ: <span id="fontSizeValue">48</span></label>
-        <input id="fontSize" type="range" min="18" max="100" value="48">
-      </div>
-      <div>
-        <label>Màu chữ</label>
-        <input id="fontColor" type="color" value="#ffffff">
-      </div>
-    </div>
-
-    <label>Kiểu hiển thị tiêu đề</label>
-    <select id="headlineStyle">
-      <option value="bar">Thanh nền đen bán trong suốt</option>
-      <option value="plain">Chữ trực tiếp trên ảnh</option>
-    </select>
-
-    <div class="row">
-      <div>
-        <label>Độ đậm viền chữ</label>
-        <input id="outlineWidth" type="range" min="0" max="8" value="3">
-      </div>
-      <div>
-        <label>Độ trong suốt nền: <span id="opacityValue">70%</span></label>
-        <input id="barOpacity" type="range" min="0" max="100" value="70">
-      </div>
-    </div>
-
-    <div class="row">
-      <div>
-        <label>Lề dưới: <span id="bottomValue">7%</span></label>
-        <input id="bottomMargin" type="range" min="2" max="18" value="7">
-      </div>
-      <div>
-        <label>Căn chữ</label>
-        <select id="alignment">
-          <option value="center">Căn giữa</option>
-          <option value="left">Căn trái</option>
-          <option value="right">Căn phải</option>
-        </select>
-      </div>
-    </div>
-
-    <label>Độ rộng vùng tiêu đề: <span id="widthValue">90%</span></label>
-    <input id="headlineWidth" type="range" min="50" max="100" value="90">
-
-    <label class="checkrow">
-      <input id="shadow" type="checkbox" checked>
-      Bật bóng chữ để dễ đọc
-    </label>
-
-    <label class="checkrow">
-      <input id="uppercase" type="checkbox" checked>
-      Viết HOA toàn bộ tiêu đề
-    </label>
-
-    <div id="headlineSample">BREAKING NEWS: WHAT HAPPENS NEXT?</div>
-    <p class="small">Tiêu đề được đặt ở dưới cùng của khung hình. Nếu tiêu đề dài, chữ sẽ tự xuống dòng để nằm gọn trong video.</p>
-  </div>
-
-  <div class="panel">
-    <h2>3. Thư viện nhạc / âm thanh</h2>
-    <label>Thêm tệp âm thanh hoặc video có âm thanh</label>
-    <input id="musicInput" type="file" accept="audio/*,video/mp4,video/webm,video/quicktime,.mp3,.wav,.m4a,.aac,.ogg,.mp4,.webm,.mov,.m4v" multiple>
-
-    <div class="actions">
-      <button id="stopMusic">Dừng nhạc</button>
-      <button id="clearMusic">Xóa thư viện</button>
-    </div>
-    <div id="musicLibrary"></div>
-
-    <label>Âm lượng: <span id="volumeValue">35%</span></label>
-    <input id="volume" type="range" min="0" max="100" value="35">
-
-    <p class="small">Thư viện lưu trên trình duyệt hiện tại bằng IndexedDB. MP4/MOV chỉ phát được nếu trình duyệt hỗ trợ codec và tệp có âm thanh. Tệp video được dùng làm nguồn âm thanh, không ghép hình ảnh của tệp đó vào video xuất.</p>
-  </div>
+<div class="panel">
+<h2>3. Thư viện nhạc / âm thanh</h2>
+<label>Thêm tệp âm thanh hoặc video MP4 có tiếng</label>
+<input id="musicInput" type="file" accept="audio/*,video/mp4,video/webm,video/quicktime,.mp3,.wav,.m4a,.aac,.ogg,.mp4,.webm,.mov,.m4v" multiple>
+<div class="actions"><button id="stopMusic">Dừng nhạc</button><button id="clearMusic">Xóa thư viện</button></div>
+<div id="musicLibrary"></div>
+<label>Âm lượng: <span id="volumeValue">35%</span></label><input id="volume" type="range" min="0" max="100" value="35">
+<p class="small">MP4 được lưu nguyên tệp trong IndexedDB và dùng phần âm thanh làm nhạc nền. Tệp phải có track âm thanh và codec được trình duyệt hỗ trợ. Thư viện chỉ nằm trên trình duyệt/thiết bị này.</p>
+</div>
 </section>
 
-<section>
-  <div class="panel">
-    <h2>4. Xem trước video</h2>
-    <div id="previewWrap">
-      <canvas id="canvas" width="1080" height="1920"></canvas>
-    </div>
-
-    <div class="actions">
-      <button id="previewButton" class="primary">▶ Phát xem trước</button>
-      <button id="pauseButton">⏸ Tạm dừng</button>
-      <button id="resetButton">↺ Về đầu</button>
-    </div>
-
-    <label>Tiến trình xem trước</label>
-    <input id="seek" type="range" min="0" max="1000" value="0">
-
-    <div class="actions">
-      <button id="exportButton" class="primary">⬇ Xuất video WebM</button>
-    </div>
-
-    <progress id="progress" max="100" value="0" class="hidden"></progress>
-    <div id="status">Sẵn sàng. Hãy tải ảnh để bắt đầu.</div>
-    <p class="small">Xuất video sử dụng Canvas và MediaRecorder của trình duyệt. Kết quả là WebM, không phải MP4. Để có tiếng, hãy chọn nhạc trước khi xuất và không đóng trang trong quá trình xử lý.</p>
-  </div>
-</section>
+<section><div class="panel">
+<h2>4. Xem trước video</h2>
+<div id="previewWrap"><canvas id="canvas" width="1080" height="1920"></canvas></div>
+<div class="actions"><button id="previewButton" class="primary">▶ Phát xem trước</button><button id="pauseButton">⏸ Tạm dừng</button><button id="resetButton">↺ Về đầu</button></div>
+<label>Tiến trình xem trước</label><input id="seek" type="range" min="0" max="1000" value="0">
+<div class="actions"><button id="exportButton" class="primary">⬇ Xuất video WebM</button></div>
+<progress id="progress" max="100" value="0" class="hidden"></progress>
+<div id="status">Sẵn sàng. Hãy tải ảnh để bắt đầu.</div>
+<p class="small">Kết quả xuất là WebM, không phải MP4. Không đóng trang trong lúc xuất. Nếu cần MP4, bạn có thể chuyển đổi WebM bằng phần mềm dựng video sau khi xuất.</p>
+</div></section>
 </main>
-
-<video id="audioVideo" class="hidden" playsinline preload="auto"></video>
-<audio id="audioElement" class="hidden" preload="auto"></audio>
+<video id="audioVideo" class="hidden" playsinline preload="metadata"></video>
+<audio id="audioElement" class="hidden" preload="metadata"></audio>
 
 <script>
 (() => {
-  "use strict";
+"use strict";
+const $ = id => document.getElementById(id);
+const canvas = $("canvas");
+const ctx = canvas.getContext("2d");
+let images = [], selectedTrackId = null, library = [], previewing = false;
+let previewStart = 0, previewOffset = 0, previewRAF = null, exportInProgress = false;
+let db = null, audioContext = null, audioDestination = null, gainNode = null;
+let audioSources = new WeakMap(), activeAudioElement = null, activeObjectURL = null;
 
-  const $ = id => document.getElementById(id);
-  const canvas = $("canvas");
-  const ctx = canvas.getContext("2d");
-
-  let images = [];
-  let selectedTrackId = null;
-  let library = [];
-  let previewing = false;
-  let previewStart = 0;
-  let previewOffset = 0;
-  let previewRAF = null;
-  let exportInProgress = false;
-  let db = null;
-  let audioContext = null;
-  let audioDestination = null;
-  let audioSources = new WeakMap();
-  let gainNode = null;
-  let activeAudioElement = null;
-  let activeObjectURL = null;
-
-  const audioEl = $("audioElement");
-  const videoEl = $("audioVideo");
-
-  function getDuration() {
-    const n = Number($("duration").value);
-    return Math.max(3, Math.min(180, Number.isFinite(n) ? n : 10));
+function getDuration() {
+  const n = Number($("duration").value);
+  return Math.max(3, Math.min(180, Number.isFinite(n) ? n : 10));
+}
+function ratioDimensions() {
+  const res = Number($("resolution").value);
+  const map = {"9:16":[9,16],"16:9":[16,9],"1:1":[1,1],"4:5":[4,5]};
+  const [rw,rh] = map[$("ratio").value] || [9,16];
+  return rw >= rh ? [res,Math.round(res*rh/rw)] : [Math.round(res*rw/rh),res];
+}
+function updateCanvasSize() {
+  const [w,h] = ratioDimensions();
+  canvas.width = w; canvas.height = h;
+  drawFrame(previewOffset/getDuration());
+}
+function currentHeadline() {
+  let t = $("headline").value.trim();
+  return $("uppercase").checked ? t.toLocaleUpperCase() : t;
+}
+function headlineSettings() {
+  return {text:currentHeadline(),font:$("font").value,weight:$("fontWeight").value,
+    size:Number($("fontSize").value),color:$("fontColor").value,style:$("headlineStyle").value,
+    outline:Number($("outlineWidth").value),opacity:Number($("barOpacity").value)/100,
+    bottom:Number($("bottomMargin").value)/100,align:$("alignment").value,
+    width:Number($("headlineWidth").value)/100,shadow:$("shadow").checked};
+}
+function wrapText(text,maxWidth,font) {
+  ctx.font=font;
+  const words=text.split(/\s+/).filter(Boolean),lines=[];
+  let line="";
+  for (const word of words) {
+    const test=line?line+" "+word:word;
+    if (ctx.measureText(test).width<=maxWidth || !line) line=test;
+    else { lines.push(line); line=word; }
   }
-
-  function ratioDimensions() {
-    const res = Number($("resolution").value);
-    const ratio = $("ratio").value;
-    const map = {
-      "9:16": [9, 16],
-      "16:9": [16, 9],
-      "1:1": [1, 1],
-      "4:5": [4, 5]
-    };
-    const [rw, rh] = map[ratio] || [9, 16];
-    let w, h;
-    if (rw >= rh) {
-      w = res;
-      h = Math.round(res * rh / rw);
-    } else {
-      h = res;
-      w = Math.round(res * rw / rh);
-    }
-    return [w, h];
+  if(line) lines.push(line);
+  return lines;
+}
+function drawHeadline() {
+  const s=headlineSettings();
+  if(!s.text)return;
+  const W=canvas.width,H=canvas.height,maxWidth=W*s.width;
+  const fontPx=Math.max(12,s.size*W/1080);
+  const font=`${s.weight} ${fontPx}px "${s.font}", Arial, sans-serif`;
+  const lineHeight=fontPx*1.18,padX=fontPx*.35,padY=fontPx*.22;
+  ctx.save();ctx.font=font;ctx.textBaseline="top";
+  let lines=wrapText(s.text,Math.max(30,maxWidth-padX*2),font);
+  const maxLines=Math.max(1,Math.floor(H*.35/lineHeight));
+  if(lines.length>maxLines) {
+    lines=lines.slice(0,maxLines);
+    let last=lines[maxLines-1];
+    while(last.length && ctx.measureText(last+"…").width>maxWidth-padX*2) last=last.slice(0,-1);
+    lines[maxLines-1]=last+"…";
   }
-
-  function updateCanvasSize() {
-    const [w, h] = ratioDimensions();
-    canvas.width = w;
-    canvas.height = h;
-    drawFrame(previewOffset / getDuration());
+  const textHeight=lines.length*lineHeight,boxHeight=textHeight+padY*2;
+  const boxWidth=maxWidth,x=(W-boxWidth)/2,y=H-H*s.bottom-boxHeight;
+  if(s.style==="bar"){ctx.fillStyle=`rgba(0,0,0,${s.opacity})`;ctx.fillRect(x,y,boxWidth,boxHeight);}
+  ctx.font=font;ctx.textBaseline="top";ctx.textAlign=s.align;ctx.lineJoin="round";
+  const textX=s.align==="left"?x+padX:s.align==="right"?x+boxWidth-padX:W/2;
+  if(s.shadow){ctx.shadowColor="rgba(0,0,0,.9)";ctx.shadowBlur=Math.max(3,fontPx*.16);ctx.shadowOffsetX=1;ctx.shadowOffsetY=2;}
+  for(let i=0;i<lines.length;i++){
+    const ty=y+padY+i*lineHeight;
+    if(s.outline>0){ctx.lineWidth=s.outline*W/1080;ctx.strokeStyle="#000";ctx.strokeText(lines[i],textX,ty,boxWidth-padX*2);}
+    ctx.fillStyle=s.color;ctx.fillText(lines[i],textX,ty,boxWidth-padX*2);
   }
-
-  function currentHeadline() {
-    let text = $("headline").value.trim();
-    if ($("uppercase").checked) text = text.toLocaleUpperCase();
-    return text;
+  ctx.restore();
+}
+function drawFrame(progress=0) {
+  const W=canvas.width,H=canvas.height,p=Math.max(0,Math.min(1,progress));
+  ctx.clearRect(0,0,W,H);ctx.fillStyle="#000";ctx.fillRect(0,0,W,H);
+  if(!images.length){
+    ctx.fillStyle="#aab6ce";ctx.textAlign="center";ctx.textBaseline="middle";
+    ctx.font=`bold ${Math.max(18,W*.035)}px Arial`;ctx.fillText("Upload images to get started",W/2,H/2);
+    drawHeadline();updateHeadlineSample();return;
   }
+  const total=getDuration(),currentTime=p*total;
+  const imageIndex=Math.min(images.length-1,Math.floor(currentTime/total*images.length));
+  const img=images[imageIndex],localProgress=(currentTime/total*images.length)%1;
+  let scale=1,ox=0,oy=0;const motion=$("motion").value;
+  if(motion==="zoom")scale=1+.10*localProgress;
+  if(motion==="float"){scale=1+.12*localProgress;ox=Math.sin(localProgress*Math.PI*2)*W*.025;oy=Math.cos(localProgress*Math.PI*2)*H*.015;}
+  if(motion==="pan")ox=(localProgress-.5)*W*.12;
+  const iw=img.naturalWidth||img.width,ih=img.naturalHeight||img.height;
+  const base=($("fit").value==="contain"?Math.min(W/iw,H/ih):Math.max(W/iw,H/ih))*scale;
+  const dw=iw*base,dh=ih*base;
+  ctx.save();ctx.translate(W/2+ox,H/2+oy);ctx.drawImage(img,-dw/2,-dh/2,dw,dh);ctx.restore();
+  drawHeadline();updateHeadlineSample();
+}
+function updateHeadlineSample(){
+  const s=$("headlineSample");s.textContent=currentHeadline()||"Your headline appears here";
+  s.style.fontFamily=`"${$("font").value}",Arial,sans-serif`;s.style.fontWeight=$("fontWeight").value;
+  s.style.fontSize=Math.min(36,Number($("fontSize").value)*.45)+"px";s.style.color=$("fontColor").value;
+  s.style.textShadow=$("shadow").checked?"-1px -1px 0 #000,1px -1px 0 #000,-1px 1px 0 #000,1px 1px 0 #000":"none";
+  s.style.background=$("headlineStyle").value==="bar"?`rgba(0,0,0,${Number($("barOpacity").value)/100})`:"transparent";
+  s.style.textAlign=$("alignment").value;
+}
+function refreshLabels(){
+  $("fontSizeValue").textContent=$("fontSize").value;$("opacityValue").textContent=$("barOpacity").value+"%";
+  $("bottomValue").textContent=$("bottomMargin").value+"%";$("widthValue").textContent=$("headlineWidth").value+"%";
+  $("volumeValue").textContent=$("volume").value+"%";updateHeadlineSample();
+}
+function stopPreview(){previewing=false;if(previewRAF)cancelAnimationFrame(previewRAF);previewRAF=null;}
+function previewTick(now){
+  if(!previewing)return;
+  const elapsed=now-previewStart+previewOffset*1000,durationMs=getDuration()*1000;
+  if(elapsed>=durationMs){previewOffset=0;stopPreview();drawFrame(0);$("seek").value=0;return;}
+  previewOffset=elapsed/1000;drawFrame(elapsed/durationMs);$("seek").value=Math.round(elapsed/durationMs*1000);
+  previewRAF=requestAnimationFrame(previewTick);
+}
+function startPreview(){if(exportInProgress)return;stopPreview();previewOffset=Math.min(previewOffset,getDuration());previewStart=performance.now();previewing=true;previewRAF=requestAnimationFrame(previewTick);}
 
-  function headlineSettings() {
-    return {
-      text: currentHeadline(),
-      font: $("font").value,
-      weight: $("fontWeight").value,
-      size: Number($("fontSize").value),
-      color: $("fontColor").value,
-      style: $("headlineStyle").value,
-      outline: Number($("outlineWidth").value),
-      opacity: Number($("barOpacity").value) / 100,
-      bottom: Number($("bottomMargin").value) / 100,
-      align: $("alignment").value,
-      width: Number($("headlineWidth").value) / 100,
-      shadow: $("shadow").checked
-    };
+$("imageInput").addEventListener("change",async e=>{
+  const files=[...e.target.files].filter(f=>f.type.startsWith("image/")),loaded=[];
+  for(const file of files){
+    try{const url=URL.createObjectURL(file),img=new Image();img.src=url;await img.decode();loaded.push(img);}
+    catch(err){console.warn("Không tải được ảnh",err);}
   }
+  images.forEach(img=>{if(img.src.startsWith("blob:"))URL.revokeObjectURL(img.src);});
+  images=loaded;previewOffset=0;updateCanvasSize();drawFrame(0);
+  $("status").textContent=`Đã tải ${images.length} ảnh.`;
+});
+["ratio","resolution","duration","motion","fit","headline","font","fontWeight","fontSize","fontColor","headlineStyle","outlineWidth","barOpacity","bottomMargin","alignment","headlineWidth","shadow","uppercase"].forEach(id=>{
+  $(id).addEventListener("input",()=>{if(id==="ratio"||id==="resolution")updateCanvasSize();refreshLabels();drawFrame(previewOffset/getDuration());});
+  $(id).addEventListener("change",()=>{if(id==="ratio"||id==="resolution")updateCanvasSize();refreshLabels();drawFrame(previewOffset/getDuration());});
+});
+$("previewButton").addEventListener("click",startPreview);
+$("pauseButton").addEventListener("click",()=>{stopPreview();drawFrame(previewOffset/getDuration());});
+$("resetButton").addEventListener("click",()=>{stopPreview();previewOffset=0;$("seek").value=0;drawFrame(0);});
+$("seek").addEventListener("input",()=>{stopPreview();previewOffset=Number($("seek").value)/1000*getDuration();drawFrame(previewOffset/getDuration());});
 
-  function wrapText(text, maxWidth, font) {
-    ctx.font = font;
-    const words = text.split(/\s+/).filter(Boolean);
-    const lines = [];
-    let line = "";
-
-    for (const word of words) {
-      const test = line ? line + " " + word : word;
-      if (ctx.measureText(test).width <= maxWidth || !line) {
-        line = test;
-      } else {
-        lines.push(line);
-        line = word;
-      }
-    }
-    if (line) lines.push(line);
-    return lines;
-  }
-
-  function drawHeadline() {
-    const s = headlineSettings();
-    if (!s.text) return;
-
-    const W = canvas.width;
-    const H = canvas.height;
-    const maxWidth = W * s.width;
-    const fontPx = Math.max(12, s.size * W / 1080);
-    const font = `${s.weight} ${fontPx}px "${s.font}", Arial, sans-serif`;
-    const lineHeight = fontPx * 1.18;
-    const padX = fontPx * 0.35;
-    const padY = fontPx * 0.22;
-
-    ctx.save();
-    ctx.font = font;
-    ctx.textBaseline = "top";
-
-    const lines = wrapText(s.text, Math.max(30, maxWidth - padX * 2), font);
-    const actualLines = lines.slice(0, Math.max(1, Math.floor(H * 0.35 / lineHeight)));
-    const textHeight = actualLines.length * lineHeight;
-    const boxHeight = textHeight + padY * 2;
-    const boxWidth = maxWidth;
-    const x = (W - boxWidth) / 2;
-    const y = H - H * s.bottom - boxHeight;
-
-    if (s.style === "bar") {
-      ctx.fillStyle = `rgba(0,0,0,${s.opacity})`;
-      ctx.fillRect(x, y, boxWidth, boxHeight);
-    }
-
-    ctx.font = font;
-    ctx.textBaseline = "top";
-    ctx.textAlign = s.align;
-    ctx.lineJoin = "round";
-
-    let textX;
-    if (s.align === "left") textX = x + padX;
-    else if (s.align === "right") textX = x + boxWidth - padX;
-    else textX = W / 2;
-
-    if (s.shadow) {
-      ctx.shadowColor = "rgba(0,0,0,0.9)";
-      ctx.shadowBlur = Math.max(3, fontPx * 0.16);
-      ctx.shadowOffsetX = 1;
-      ctx.shadowOffsetY = 2;
-    }
-
-    for (let i = 0; i < actualLines.length; i++) {
-      const ty = y + padY + i * lineHeight;
-      if (s.outline > 0) {
-        ctx.lineWidth = s.outline * W / 1080;
-        ctx.strokeStyle = "#000000";
-        ctx.strokeText(actualLines[i], textX, ty, boxWidth - padX * 2);
-      }
-      ctx.fillStyle = s.color;
-      ctx.fillText(actualLines[i], textX, ty, boxWidth - padX * 2);
-    }
-
-    ctx.restore();
-  }
-
-  function drawFrame(progress = 0) {
-    const W = canvas.width;
-    const H = canvas.height;
-    const p = Math.max(0, Math.min(1, progress));
-
-    ctx.clearRect(0, 0, W, H);
-    ctx.fillStyle = "#000";
-    ctx.fillRect(0, 0, W, H);
-
-    if (!images.length) {
-      ctx.fillStyle = "#aab6ce";
-      ctx.textAlign = "center";
-      ctx.textBaseline = "middle";
-      ctx.font = `bold ${Math.max(18, W * 0.035)}px Arial`;
-      ctx.fillText("Upload images to get started", W / 2, H / 2);
-      drawHeadline();
-      updateHeadlineSample();
-      return;
-    }
-
-    const total = getDuration();
-    const currentTime = p * total;
-    const imageIndex = Math.min(
-      images.length - 1,
-      Math.floor(currentTime / total * images.length)
-    );
-    const img = images[imageIndex];
-    const localProgress = (currentTime / total * images.length) % 1;
-
-    let scale = 1;
-    let offsetX = 0;
-    let offsetY = 0;
-    const motion = $("motion").value;
-
-    if (motion === "zoom") scale = 1 + 0.10 * localProgress;
-    if (motion === "float") {
-      scale = 1 + 0.12 * localProgress;
-      offsetX = Math.sin(localProgress * Math.PI * 2) * W * 0.025;
-      offsetY = Math.cos(localProgress * Math.PI * 2) * H * 0.015;
-    }
-    if (motion === "pan") {
-      offsetX = (localProgress - 0.5) * W * 0.12;
-    }
-
-    const iw = img.naturalWidth || img.width;
-    const ih = img.naturalHeight || img.height;
-    const fit = $("fit").value;
-    let baseScale = fit === "contain"
-      ? Math.min(W / iw, H / ih)
-      : Math.max(W / iw, H / ih);
-
-    baseScale *= scale;
-    const dw = iw * baseScale;
-    const dh = ih * baseScale;
-
-    ctx.save();
-    ctx.translate(W / 2 + offsetX, H / 2 + offsetY);
-    ctx.drawImage(img, -dw / 2, -dh / 2, dw, dh);
-    ctx.restore();
-
-    drawHeadline();
-    updateHeadlineSample();
-  }
-
-  function updateHeadlineSample() {
-    const sample = $("headlineSample");
-    sample.textContent = currentHeadline() || "Your headline appears here";
-    sample.style.fontFamily = `"${$("font").value}", Arial, sans-serif`;
-    sample.style.fontWeight = $("fontWeight").value;
-    sample.style.fontSize = Math.min(36, Number($("fontSize").value) * 0.45) + "px";
-    sample.style.color = $("fontColor").value;
-    sample.style.textShadow = $("shadow").checked
-      ? "-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000"
-      : "none";
-    sample.style.background = $("headlineStyle").value === "bar"
-      ? `rgba(0,0,0,${Number($("barOpacity").value) / 100})`
-      : "transparent";
-    sample.style.textAlign = $("alignment").value;
-  }
-
-  function refreshLabels() {
-    $("fontSizeValue").textContent = $("fontSize").value;
-    $("opacityValue").textContent = $("barOpacity").value + "%";
-    $("bottomValue").textContent = $("bottomMargin").value + "%";
-    $("widthValue").textContent = $("headlineWidth").value + "%";
-    $("volumeValue").textContent = $("volume").value + "%";
-    updateHeadlineSample();
-  }
-
-  function stopPreview() {
-    previewing = false;
-    if (previewRAF) cancelAnimationFrame(previewRAF);
-    previewRAF = null;
-  }
-
-  function previewTick(now) {
-    if (!previewing) return;
-    const durationMs = getDuration() * 1000;
-    const elapsed = now - previewStart + previewOffset * 1000;
-
-    if (elapsed >= durationMs) {
-      previewOffset = 0;
-      stopPreview();
-      drawFrame(0);
-      $("seek").value = 0;
-      return;
-    }
-
-    previewOffset = elapsed / 1000;
-    drawFrame(elapsed / durationMs);
-    $("seek").value = Math.round(elapsed / durationMs * 1000);
-    previewRAF = requestAnimationFrame(previewTick);
-  }
-
-  function startPreview() {
-    if (exportInProgress) return;
-    stopPreview();
-    previewOffset = Math.min(previewOffset, getDuration());
-    previewStart = performance.now();
-    previewing = true;
-    previewRAF = requestAnimationFrame(previewTick);
-  }
-
-  $("imageInput").addEventListener("change", async e => {
-    const files = [...e.target.files].filter(f => f.type.startsWith("image/"));
-    const loaded = [];
-
-    for (const file of files) {
-      try {
-        const url = URL.createObjectURL(file);
-        const img = new Image();
-        img.src = url;
-        await img.decode();
-        loaded.push(img);
-      } catch (err) {
-        console.warn("Could not load image", err);
-      }
-    }
-
-    images.forEach(img => {
-      if (img.src.startsWith("blob:")) URL.revokeObjectURL(img.src);
-    });
-    images = loaded;
-    previewOffset = 0;
-    updateCanvasSize();
-    drawFrame(0);
-    $("status").textContent = `${images.length} ảnh đã sẵn sàng.`;
+// IndexedDB: wait for transaction completion, not only request success.
+function openDB(){
+  return new Promise((resolve,reject)=>{
+    if(!("indexedDB" in window)){reject(new Error("Trình duyệt không hỗ trợ IndexedDB."));return;}
+    const req=indexedDB.open("NewsMotionStudioDB",1);
+    req.onupgradeneeded=()=>{const d=req.result;if(!d.objectStoreNames.contains("tracks"))d.createObjectStore("tracks",{keyPath:"id"});};
+    req.onsuccess=()=>{db=req.result;db.onversionchange=()=>{db.close();db=null;};resolve(db);};
+    req.onerror=()=>reject(req.error||new Error("Không mở được cơ sở dữ liệu."));
+    req.onblocked=()=>console.warn("Mở DB bị chặn bởi tab khác.");
   });
-
-  [
-    "ratio", "resolution", "duration", "motion", "fit",
-    "headline", "font", "fontWeight", "fontSize", "fontColor",
-    "headlineStyle", "outlineWidth", "barOpacity", "bottomMargin",
-    "alignment", "headlineWidth", "shadow", "uppercase"
-  ].forEach(id => {
-    $(id).addEventListener("input", () => {
-      if (id === "ratio" || id === "resolution") updateCanvasSize();
-      refreshLabels();
-      drawFrame(previewOffset / getDuration());
-    });
-    $(id).addEventListener("change", () => {
-      if (id === "ratio" || id === "resolution") updateCanvasSize();
-      refreshLabels();
-      drawFrame(previewOffset / getDuration());
-    });
+}
+function dbRequest(mode,action){
+  return new Promise((resolve,reject)=>{
+    if(!db){reject(new Error("Cơ sở dữ liệu chưa được mở."));return;}
+    let tx,reqResult,requestDone=false,settled=false;
+    const fail=err=>{if(!settled){settled=true;reject(err instanceof Error?err:new Error(String(err||"Lỗi cơ sở dữ liệu")));}};
+    try{
+      tx=db.transaction("tracks",mode);
+      const req=action(tx.objectStore("tracks"));
+      req.onsuccess=()=>{reqResult=req.result;requestDone=true;};
+      req.onerror=()=>fail(req.error||new Error("Yêu cầu cơ sở dữ liệu thất bại."));
+      tx.oncomplete=()=>{if(settled)return;settled=true;if(requestDone)resolve(reqResult);else reject(new Error("Không nhận được kết quả từ giao dịch."));};
+      tx.onerror=()=>fail(tx.error||new Error("Giao dịch cơ sở dữ liệu bị lỗi."));
+      tx.onabort=()=>fail(tx.error||new Error("Giao dịch lưu dữ liệu bị hủy."));
+    }catch(err){fail(err);}
   });
-
-  $("previewButton").addEventListener("click", startPreview);
-  $("pauseButton").addEventListener("click", () => {
-    stopPreview();
-    drawFrame(previewOffset / getDuration());
-  });
-  $("resetButton").addEventListener("click", () => {
-    stopPreview();
-    previewOffset = 0;
-    $("seek").value = 0;
-    drawFrame(0);
-  });
-  $("seek").addEventListener("input", () => {
-    stopPreview();
-    previewOffset = Number($("seek").value) / 1000 * getDuration();
-    drawFrame(previewOffset / getDuration());
-  });
-
-  // Persistent local music library
-  function openDB() {
-    return new Promise((resolve, reject) => {
-      const request = indexedDB.open("NewsMotionStudioDB", 1);
-      request.onupgradeneeded = () => {
-        const database = request.result;
-        if (!database.objectStoreNames.contains("tracks")) {
-          database.createObjectStore("tracks", { keyPath: "id" });
-        }
-      };
-      request.onsuccess = () => {
-        db = request.result;
-        resolve(db);
-      };
-      request.onerror = () => reject(request.error);
-    });
-  }
-
-  function dbRequest(mode, action) {
-    return new Promise((resolve, reject) => {
-      const tx = db.transaction("tracks", mode);
-      const store = tx.objectStore("tracks");
-      const request = action(store);
-      request.onsuccess = () => resolve(request.result);
-      request.onerror = () => reject(request.error);
-    });
-  }
-
-  async function loadLibrary() {
-    if (!db) return;
-    library = await dbRequest("readonly", store => store.getAll());
-    renderLibrary();
-  }
-
-  function isVideoFile(file) {
-    return file.type.startsWith("video/") ||
-      /\.(mp4|mov|m4v|webm|ogv)$/i.test(file.name);
-  }
-
-  function isAudioFile(file) {
-    return file.type.startsWith("audio/") ||
-      /\.(mp3|wav|m4a|aac|ogg|opus|flac)$/i.test(file.name);
-  }
-
-  $("musicInput").addEventListener("change", async e => {
-    if (!db) {
-      $("status").textContent = "Không thể mở thư viện lưu trữ của trình duyệt.";
-      return;
+}
+async function loadLibrary(){
+  if(!db)throw new Error("Cơ sở dữ liệu chưa sẵn sàng.");
+  const items=await dbRequest("readonly",s=>s.getAll());
+  library=Array.isArray(items)?items:[];
+  renderLibrary();
+  return library.length;
+}
+function isVideoFile(file){return (file.type||"").startsWith("video/")||/\.(mp4|mov|m4v|webm|ogv)$/i.test(file.name);}
+function isAudioFile(file){return (file.type||"").startsWith("audio/")||/\.(mp3|wav|m4a|aac|ogg|opus|flac)$/i.test(file.name);}
+$("musicInput").addEventListener("change",async e=>{
+  const files=[...(e.target.files||[])];if(!files.length)return;
+  try{
+    if(!db)await openDB();
+    let saved=0;const errors=[];
+    for(const file of files){
+      if(!isAudioFile(file)&&!isVideoFile(file)){errors.push(file.name+": Định dạng không hỗ trợ.");continue;}
+      const track={id:crypto.randomUUID?crypto.randomUUID():Date.now()+"-"+Math.random().toString(16).slice(2),
+        name:file.name,type:file.type||(isVideoFile(file)?"video/mp4":"audio/mpeg"),isVideo:isVideoFile(file),blob:file,addedAt:Date.now()};
+      try{await dbRequest("readwrite",s=>s.put(track));saved++;}
+      catch(err){console.error("Lỗi lưu",file.name,err);errors.push(file.name+": "+(err.message||"Không lưu được."));}
     }
-
-    const files = [...e.target.files];
-    let count = 0;
-
-    for (const file of files) {
-      if (!isAudioFile(file) && !isVideoFile(file)) continue;
-
-      const track = {
-        id: crypto.randomUUID ? crypto.randomUUID() :
-          Date.now() + "-" + Math.random().toString(16).slice(2),
-        name: file.name,
-        type: file.type || (isVideoFile(file) ? "video/mp4" : "audio/mpeg"),
-        isVideo: isVideoFile(file),
-        blob: file,
-        addedAt: Date.now()
-      };
-
-      try {
-        await dbRequest("readwrite", store => store.put(track));
-        count++;
-      } catch (err) {
-        console.error(err);
-      }
-    }
-
     await loadLibrary();
-    $("status").textContent = `${count} tệp đã thêm vào thư viện.`;
-    e.target.value = "";
-  });
-
-  function renderLibrary() {
-    const container = $("musicLibrary");
-    container.innerHTML = "";
-
-    if (!library.length) {
-      container.innerHTML = '<p class="small">Chưa có nhạc. Hãy thêm tệp ở phía trên.</p>';
-      return;
-    }
-
-    library.forEach(track => {
-      const row = document.createElement("div");
-      row.className = "track" + (track.id === selectedTrackId ? " selected" : "");
-
-      const name = document.createElement("div");
-      name.className = "trackname";
-      name.textContent = (track.isVideo ? "🎞 " : "🎵 ") + track.name;
-
-      const use = document.createElement("button");
-      use.textContent = track.id === selectedTrackId ? "Đang chọn" : "Chọn";
-      use.addEventListener("click", () => selectTrack(track.id));
-
-      const del = document.createElement("button");
-      del.textContent = "Xóa";
-      del.addEventListener("click", async () => {
-        if (selectedTrackId === track.id) stopMusic();
-        await dbRequest("readwrite", store => store.delete(track.id));
-        await loadLibrary();
-      });
-
-      row.append(name, use, del);
-      container.appendChild(row);
+    $("status").textContent=errors.length?`Đã lưu ${saved}/${files.length} tệp.\n${errors.join("\n")}`:`Đã lưu thành công ${saved} tệp. Hãy tải lại trang để kiểm tra.`;
+  }catch(err){
+    console.error(err);
+    $("status").textContent="Không thể lưu thư viện: "+(err.message||err)+"\nKiểm tra quyền lưu trữ và dung lượng trình duyệt.";
+  }finally{e.target.value="";}
+});
+function renderLibrary(){
+  const container=$("musicLibrary");container.replaceChildren();
+  if(!library.length){const p=document.createElement("p");p.className="small";p.textContent="Chưa có tệp nhạc. Thêm MP4 có âm thanh hoặc tệp audio ở phía trên.";container.appendChild(p);return;}
+  library.forEach(track=>{
+    const row=document.createElement("div");row.className="track"+(track.id===selectedTrackId?" selected":"");
+    const name=document.createElement("div");name.className="trackname";name.textContent=(track.isVideo?"🎞 ":"🎵 ")+track.name;
+    const use=document.createElement("button");use.textContent=track.id===selectedTrackId?"Đang chọn":"Chọn";use.addEventListener("click",()=>selectTrack(track.id));
+    const del=document.createElement("button");del.textContent="Xóa";del.addEventListener("click",async()=>{
+      try{if(selectedTrackId===track.id)stopMusic();await dbRequest("readwrite",s=>s.delete(track.id));await loadLibrary();}
+      catch(err){$("status").textContent="Không xóa được tệp: "+(err.message||err);}
     });
-  }
-
-  function stopMusic() {
-    audioEl.pause();
-    videoEl.pause();
-    audioEl.currentTime = 0;
-    videoEl.currentTime = 0;
-    activeAudioElement = null;
-    if (activeObjectURL) URL.revokeObjectURL(activeObjectURL);
-    activeObjectURL = null;
-  }
-
-  async function selectTrack(id) {
-    const track = library.find(t => t.id === id);
-    if (!track) return;
-
-    stopMusic();
-    selectedTrackId = id;
-    activeObjectURL = URL.createObjectURL(track.blob);
-    activeAudioElement = track.isVideo ? videoEl : audioEl;
-    activeAudioElement.src = activeObjectURL;
-    activeAudioElement.loop = true;
-    activeAudioElement.volume = Number($("volume").value) / 100;
-
-    try {
-      await activeAudioElement.play();
-      $("status").textContent = "Đang phát: " + track.name;
-    } catch (err) {
-      $("status").textContent = "Đã chọn tệp. Nhấn chọn lại nếu trình duyệt chặn phát tự động.";
-    }
-    renderLibrary();
-  }
-
-  $("volume").addEventListener("input", () => {
-    const v = Number($("volume").value) / 100;
-    audioEl.volume = v;
-    videoEl.volume = v;
-    $("volumeValue").textContent = $("volume").value + "%";
-    if (gainNode) gainNode.gain.value = v;
+    row.append(name,use,del);container.appendChild(row);
   });
-
-  $("stopMusic").addEventListener("click", () => {
-    stopMusic();
-    $("status").textContent = "Đã dừng nhạc.";
-  });
-
-  $("clearMusic").addEventListener("click", async () => {
-    if (!db) return;
-    stopMusic();
-    selectedTrackId = null;
-    await dbRequest("readwrite", store => store.clear());
-    await loadLibrary();
-    $("status").textContent = "Đã xóa thư viện nhạc trên trình duyệt này.";
-  });
-
-  async function prepareAudioCapture() {
-    if (!selectedTrackId) return null;
-    if (!activeAudioElement || !activeAudioElement.src) return null;
-
-    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-    if (!AudioContextClass) return null;
-
-    if (!audioContext) {
-      audioContext = new AudioContextClass();
-      audioDestination = audioContext.createMediaStreamDestination();
-      gainNode = audioContext.createGain();
-      gainNode.gain.value = Number($("volume").value) / 100;
-      gainNode.connect(audioDestination);
-    }
-
-    if (audioContext.state === "suspended") await audioContext.resume();
-
-    let source = audioSources.get(activeAudioElement);
-    if (!source) {
-      source = audioContext.createMediaElementSource(activeAudioElement);
-      source.connect(gainNode);
-      audioSources.set(activeAudioElement, source);
-    }
-
-    return audioDestination.stream;
+}
+const audioEl=$("audioElement"),videoEl=$("audioVideo");
+function stopMusic(){
+  audioEl.pause();videoEl.pause();try{audioEl.currentTime=0;videoEl.currentTime=0;}catch(_){}
+  activeAudioElement=null;
+  if(activeObjectURL){URL.revokeObjectURL(activeObjectURL);activeObjectURL=null;}
+}
+async function selectTrack(id){
+  const track=library.find(t=>t.id===id);if(!track)return;
+  stopMusic();selectedTrackId=id;
+  activeObjectURL=URL.createObjectURL(track.blob);activeAudioElement=track.isVideo?videoEl:audioEl;
+  activeAudioElement.src=activeObjectURL;activeAudioElement.loop=true;activeAudioElement.volume=Number($("volume").value)/100;
+  renderLibrary();
+  try{await activeAudioElement.play();$("status").textContent="Đang phát: "+track.name;}
+  catch(err){$("status").textContent="Đã chọn "+track.name+". Nếu không phát được, MP4 có thể không có tiếng hoặc codec không được hỗ trợ.";}
+}
+$("volume").addEventListener("input",()=>{const v=Number($("volume").value)/100;audioEl.volume=v;videoEl.volume=v;$("volumeValue").textContent=$("volume").value+"%";if(gainNode)gainNode.gain.value=v;});
+$("stopMusic").addEventListener("click",()=>{stopMusic();$("status").textContent="Đã dừng nhạc.";});
+$("clearMusic").addEventListener("click",async()=>{
+  if(!db)return;
+  if(!confirm("Xóa toàn bộ thư viện nhạc đã lưu trên trình duyệt này?"))return;
+  try{stopMusic();selectedTrackId=null;await dbRequest("readwrite",s=>s.clear());await loadLibrary();$("status").textContent="Đã xóa thư viện nhạc.";}
+  catch(err){$("status").textContent="Không xóa được thư viện: "+(err.message||err);}
+});
+async function prepareAudioCapture(){
+  if(!selectedTrackId||!activeAudioElement||!activeAudioElement.src)return null;
+  const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return null;
+  if(!audioContext){
+    audioContext=new AC();audioDestination=audioContext.createMediaStreamDestination();
+    gainNode=audioContext.createGain();gainNode.gain.value=Number($("volume").value)/100;gainNode.connect(audioDestination);
   }
-
-  function chooseRecorderMime() {
-    const options = [
-      "video/webm;codecs=vp9,opus",
-      "video/webm;codecs=vp8,opus",
-      "video/webm"
-    ];
-    return options.find(type =>
-      window.MediaRecorder && MediaRecorder.isTypeSupported(type)
-    ) || "";
-  }
-
-  function wait(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
-  }
-
-  async function exportVideo() {
-    if (exportInProgress) return;
-
-    if (!images.length) {
-      $("status").textContent = "Hãy tải ít nhất một ảnh trước khi xuất video.";
-      return;
-    }
-
-    if (!("MediaRecorder" in window) || !canvas.captureStream) {
-      $("status").textContent = "Trình duyệt này chưa hỗ trợ xuất video. Hãy thử Chrome hoặc Edge trên máy tính.";
-      return;
-    }
-
-    exportInProgress = true;
-    stopPreview();
-
-    const exportButton = $("exportButton");
-    const progress = $("progress");
-    exportButton.disabled = true;
-    progress.classList.remove("hidden");
-    progress.value = 0;
-
-    let recorder = null;
-    let exportAudio = null;
-
-    try {
-      const duration = getDuration();
-      const fps = 30;
-      const canvasStream = canvas.captureStream(fps);
-      exportAudio = await prepareAudioCapture();
-
-      if (exportAudio) {
-        exportAudio.getAudioTracks().forEach(track => canvasStream.addTrack(track));
-      }
-
-      const mimeType = chooseRecorderMime();
-      const chunks = [];
-
-      recorder = new MediaRecorder(
-        canvasStream,
-        mimeType ? { mimeType } : undefined
-      );
-
-      const stopped = new Promise((resolve, reject) => {
-        recorder.ondataavailable = e => {
-          if (e.data && e.data.size) chunks.push(e.data);
-        };
-        recorder.onstop = resolve;
-        recorder.onerror = e => reject(e.error || new Error("Lỗi ghi video"));
-      });
-
-      if (selectedTrackId && activeAudioElement) {
-        activeAudioElement.currentTime = 0;
-        activeAudioElement.loop = true;
-        activeAudioElement.volume = Number($("volume").value) / 100;
-        try {
-          await activeAudioElement.play();
-        } catch (err) {
-          console.warn("Audio playback failed", err);
-        }
-      }
-
-      recorder.start(250);
-      const start = performance.now();
-
-      await new Promise(resolve => {
-        function render(now) {
-          const elapsed = now - start;
-          const p = Math.min(1, elapsed / (duration * 1000));
-          drawFrame(p);
-          progress.value = p * 100;
-          $("status").textContent =
-            `Đang xuất video... ${Math.round(p * 100)}%`;
-
-          if (p < 1) {
-            requestAnimationFrame(render);
-          } else {
-            resolve();
-          }
-        }
-        requestAnimationFrame(render);
-      });
-
-      await wait(150);
-      recorder.stop();
-      await stopped;
-
-      canvasStream.getTracks().forEach(track => track.stop());
-
-      const blob = new Blob(chunks, { type: recorder.mimeType || "video/webm" });
-      if (!blob.size) throw new Error("Tệp xuất rỗng. Hãy thử lại.");
-
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = "news-motion-video.webm";
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      setTimeout(() => URL.revokeObjectURL(url), 60000);
-
-      $("status").textContent =
-        `Xuất video hoàn tất! Dung lượng: ${(blob.size / 1024 / 1024).toFixed(2)} MB.`;
-      progress.value = 100;
-    } catch (err) {
-      console.error(err);
-      $("status").textContent = "Không thể xuất video: " + (err.message || err);
-      if (recorder && recorder.state !== "inactive") {
-        try { recorder.stop(); } catch (_) {}
-      }
-    } finally {
-      exportInProgress = false;
-      exportButton.disabled = false;
-      previewOffset = 0;
-      drawFrame(0);
-    }
-  }
-
-  $("exportButton").addEventListener("click", exportVideo);
-
-  // Initial setup
-  refreshLabels();
-  updateCanvasSize();
-  drawFrame(0);
-
-  openDB()
-    .then(loadLibrary)
-    .catch(err => {
-      console.error(err);
-      $("status").textContent =
-        "Không mở được thư viện nhạc. Hãy chạy trang bằng HTTPS trên GitHub Pages.";
+  if(audioContext.state==="suspended")await audioContext.resume();
+  let source=audioSources.get(activeAudioElement);
+  if(!source){source=audioContext.createMediaElementSource(activeAudioElement);source.connect(gainNode);audioSources.set(activeAudioElement,source);}
+  return audioDestination.stream;
+}
+function chooseRecorderMime(){
+  const types=["video/webm;codecs=vp9,opus","video/webm;codecs=vp8,opus","video/webm"];
+  return types.find(t=>window.MediaRecorder&&MediaRecorder.isTypeSupported(t))||"";
+}
+function wait(ms){return new Promise(r=>setTimeout(r,ms));}
+async function exportVideo(){
+  if(exportInProgress)return;
+  if(!images.length){$("status").textContent="Hãy tải ít nhất một ảnh trước khi xuất.";return;}
+  if(!window.MediaRecorder||!canvas.captureStream){$("status").textContent="Trình duyệt chưa hỗ trợ xuất video. Hãy thử Chrome hoặc Edge.";return;}
+  exportInProgress=true;stopPreview();
+  const btn=$("exportButton"),progress=$("progress");btn.disabled=true;progress.classList.remove("hidden");progress.value=0;
+  let stream=null,recorder=null;
+  try{
+    const duration=getDuration(),canvasStream=canvas.captureStream(30);stream=canvasStream;
+    const audioStream=await prepareAudioCapture();
+    if(audioStream)audioStream.getAudioTracks().forEach(t=>canvasStream.addTrack(t));
+    const mimeType=chooseRecorderMime(),chunks=[];
+    recorder=new MediaRecorder(canvasStream,mimeType?{mimeType}:undefined);
+    const stopped=new Promise((resolve,reject)=>{
+      recorder.ondataavailable=e=>{if(e.data&&e.data.size)chunks.push(e.data);};
+      recorder.onstop=resolve;recorder.onerror=e=>reject(e.error||new Error("Lỗi ghi video."));
     });
-
-  // Wait briefly for web fonts, then redraw the preview.
-  if (document.fonts && document.fonts.ready) {
-    document.fonts.ready.then(() => drawFrame(previewOffset / getDuration()));
+    if(selectedTrackId&&activeAudioElement){
+      try{activeAudioElement.currentTime=0;activeAudioElement.loop=true;activeAudioElement.volume=Number($("volume").value)/100;await activeAudioElement.play();}
+      catch(err){console.warn("Không phát được âm thanh trong lúc xuất",err);}
+    }
+    recorder.start(250);const start=performance.now();
+    await new Promise(resolve=>{
+      function render(now){
+        const p=Math.min(1,(now-start)/(duration*1000));drawFrame(p);progress.value=p*100;
+        $("status").textContent="Đang xuất video... "+Math.round(p*100)+"%";
+        if(p<1)requestAnimationFrame(render);else resolve();
+      }requestAnimationFrame(render);
+    });
+    await wait(200);recorder.stop();await stopped;
+    stream.getTracks().forEach(t=>t.stop());
+    const blob=new Blob(chunks,{type:recorder.mimeType||"video/webm"});
+    if(!blob.size)throw new Error("Tệp xuất rỗng.");
+    const url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download="news-motion-video.webm";
+    document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),60000);
+    $("status").textContent=`Xuất video hoàn tất. Dung lượng: ${(blob.size/1024/1024).toFixed(2)} MB.`;
+    progress.value=100;
+  }catch(err){
+    console.error(err);$("status").textContent="Không thể xuất video: "+(err.message||err);
+    if(recorder&&recorder.state!=="inactive"){try{recorder.stop();}catch(_){}}
+  }finally{
+    if(stream)stream.getTracks().forEach(t=>{try{t.stop();}catch(_){}});
+    exportInProgress=false;btn.disabled=false;previewOffset=0;drawFrame(0);
   }
+}
+$("exportButton").addEventListener("click",exportVideo);
+refreshLabels();updateCanvasSize();drawFrame(0);
+(async()=>{
+  try{await openDB();const count=await loadLibrary();$("status").textContent="Đã tải thư viện: "+count+" tệp.";}
+  catch(err){console.error(err);$("status").textContent="Lỗi mở thư viện: "+(err.message||err)+"\nKiểm tra cài đặt lưu trữ của trình duyệt.";}
+})();
+if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>drawFrame(previewOffset/getDuration()));
 })();
 </script>
 </body>
